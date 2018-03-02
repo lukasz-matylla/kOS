@@ -75,14 +75,8 @@ if ship:altitude < ship:body:atm:height
 
 // Circularization
 notify("Preparing for circularization").
-local circ is node(time:seconds + eta:apoapsis, 0, 0, 0).
-add circ.
-until circ:orbit:periapsis > orbitHeight * (1 - orbitMargin^2)
-{
-	set circ:prograde to circ:prograde + 1.
-}
+add periChangeNode(). // get peri up to apo
 execNode().
-
 
 // Finish
 notify("In orbit").

@@ -1,4 +1,7 @@
 local warpMargin is 30.
+local orbitMargin is 0.001.
+local bigJump is 50.
+local smallJump is 0.1.
 
 // Time to complete a maneuver
 function mnvTime
@@ -108,4 +111,86 @@ function timeToImpact
 	local g is ship:body:mu / ship:body:radius^2.
 
 	return (sqrt(v^2 + 2 * g * d) + v) / g.
+}
+
+function periChangeNode
+{
+	parameter h is alt:apoapsis.
+	set h to min(h, alt.apoapsis * (1 - orbitMargin)).
+	
+	local n is node(time:seconds + eta:apoapsis, 0, 0, 0).
+	
+	if h > alt:periapsis * (1 + orbitMargin)
+	{
+		notify("Creating prograde burn at apoapsis").
+		
+		until n:orbit:periapsis > h
+		{
+			set n:prograde to n:prograde + bigJump.
+		}
+		until circ:orbit:periapsis < h
+		{
+			set n:prograde to n:prograde - smallJump.
+		}
+	}
+	else if h < alt:periapsis * (1 - orbitMargin)
+	{
+		notify("Creating retrograde burn at apoapsis").
+		
+		until n:orbit:periapsis < h
+		{
+			set n:prograde to n:prograde - bigJump.
+		}
+		until circ:orbit:periapsis > h
+		{
+			set n:prograde to n:prograde + smallJump.
+		}
+	}
+	else
+	{
+		notify("No burn necessary").
+	}
+	
+	return n.
+}
+
+function apoChangeNode
+{
+	parameter h is alt:periapsis.
+	set h to max(h, alt.periapsis * (1 + orbitMargin)).
+	
+	local n is node(time:seconds + eta:periapsis, 0, 0, 0).
+	
+	if h > alt:apoapsis * (1 + orbitMargin)
+	{
+		notify("Creating prograde burn at periapsis").
+		
+		until n:orbit:apoapsis > h
+		{
+			set n:prograde to n:prograde + bigJump.
+		}
+		until circ:orbit:apoapsis < h
+		{
+			set n:prograde to n:prograde - smallJump.
+		}
+	}
+	else if h < alt:apoapsis * (1 - orbitMargin)
+	{
+		notify("Creating retrograde burn at periapsis").
+		
+		until n:orbit:apoapsis < h
+		{
+			set n:prograde to n:prograde - bigJump.
+		}
+		until circ:orbit:apoapsis > h
+		{
+			set n:prograde to n:prograde + smallJump.
+		}
+	}
+	else
+	{
+		notify("No burn necessary").
+	}
+	
+	return n.
 }
