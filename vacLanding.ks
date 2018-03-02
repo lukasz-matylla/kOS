@@ -3,6 +3,11 @@ local radarMargin is 100.
 local touchDownV is 2.
 local speedScale is 0.1.
 
+is ship:status <> "Orbiting" and ship:status <> "Escaping"
+{
+	notify("Incorrect ship state for this script: " + ship:status).
+}
+
 // Retrograde, but prevent instabilities at low speed
 function upwards
 {

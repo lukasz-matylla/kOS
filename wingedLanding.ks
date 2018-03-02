@@ -7,6 +7,11 @@ parameter glideAoA is 20.
 local warpMargin is 30.
 local currentV is 0.
 
+is ship:status <> "Orbiting" and ship:status <> "Escaping"
+{
+	notify("Incorrect ship state for this script: " + ship:status).
+}
+
 // Deorbit
 if alt:periapsis > deorbitPeriapsis // need to burn to deorbit
 {

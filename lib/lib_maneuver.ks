@@ -1,5 +1,4 @@
 local warpMargin is 30.
-local tuningMargin is 0.5.
 
 // Time to complete a maneuver
 function mnvTime
@@ -65,13 +64,18 @@ function hoffmanDv
 function execNode
 {
 	parameter autoWarp is true.
+	
+	if not hasnode // no node planned
+	{
+		return.
+	}
 
 	local n is nextnode.
 	local v is n:burnvector.
 
 	notify("Aligning for maneuver").
-	local startTime is time:seconds + n:eta - mnvTime(v:mag)/2.
-	lock steering to n:burnvector. // v?
+	local startTime is time:seconds + n:eta - mnvTime(v:mag/2).
+	lock steering to n:burnvector.
 	waitForAlignment().
 
 	 if autoWarp and startTime - time:seconds > warpMargin
@@ -84,7 +88,7 @@ function execNode
 	wait until time:seconds >= startTime.
 
 	notify("Maneuver burn").
-	lock throttle to min(tuningMargin * mnvTime(n:burnvector:mag), 1).
+	lock throttle to min(mnvTime(n:burnvector:mag), 1).
 	wait until n:burnvector * v < 0.
 	lock throttle to 0.
 

@@ -3,6 +3,11 @@ parameter finalBurnPeriapsis is 30000.
 
 local warpMargin is 30.
 
+is ship:status <> "Orbiting" and ship:status <> "Escaping"
+{
+	notify("Incorrect ship state for this script: " + ship:status).
+}
+
 // Deorbit
 if alt:periapsis > deorbitPeriapsis // need to burn to deorbit
 {

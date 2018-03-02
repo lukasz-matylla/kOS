@@ -10,6 +10,11 @@ local orbitMargin is 0.1.
 local warpMargin is 30.
 local circMargin is 5.
 
+is ship:status <> "Prelaunch"
+{
+	notify("Incorrect ship state for this script: " + ship:status).
+}
+
 local currentV is 0. 
 lock currentV to ship:velocity:surface.
 when ship:altitude > ship:body:atm:height*hThreshold and ship:q < pThreshold then
@@ -38,7 +43,7 @@ wait until ship:verticalSpeed > turnSpeed.
 
 // Initial turn
 notify("Initial turn").
-lock steering to heading(orbitAngle, 90 - initialTurn).
+lock steering to withAngleToHorizon(heading(orbitAngle, 0):vector, 90 - initialTurn).
 wait until currentV:mag > gtSpeed.
 
 // Gravity turn
