@@ -3,7 +3,13 @@ local radarMargin is 100.
 local touchDownV is 2.
 local speedScale is 0.1.
 
-is ship:status <> "Orbiting" and ship:status <> "Escaping"
+run once lib_notify.
+run once lib_vectors.
+run once lib_maneuvers.
+run once lib_warp.
+run once lib_staging.
+
+if ship:status <> "Orbiting" and ship:status <> "Escaping"
 {
 	notify("Incorrect ship state for this script: " + ship:status).
 }

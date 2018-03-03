@@ -1,9 +1,17 @@
-parametrer deorbitPeriapsis is 40000.
+parameter deorbitPeriapsis is 40000.
 parameter finalBurnPeriapsis is 30000.
+
+run once lib_notify.
+run once lib_vectors.
+run once lib_maneuvers.
+run once lib_warp.
+run once lib_staging.
+run once lib_chutes.
+run once lib_arrows.
 
 local warpMargin is 30.
 
-is ship:status <> "Orbiting" and ship:status <> "Escaping"
+if ship:status <> "Orbiting" and ship:status <> "Escaping"
 {
 	notify("Incorrect ship state for this script: " + ship:status).
 }
@@ -69,5 +77,5 @@ gear on.
 legs on.
 
 // Landing
-wait until ship:status = "LANDED".
+wait until ship:status = "Landed" or ship:status = "Splashed".
 notify("Landed").

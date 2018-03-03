@@ -2,5 +2,7 @@ function warpFor
 {
 	parameter dt is 0.
 
-	warpTo(time:seconds + dt).
+	local endTime is time:seconds + dt.
+	warpTo(endTime).
+	wait until time:seconds > endTime.
 }

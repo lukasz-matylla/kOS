@@ -1,13 +1,21 @@
-parametrer deorbitPeriapsis is 45000.
+parameter deorbitPeriapsis is 45000.
 parameter atmosphereMargin is 0.9.
 parameter glideQ is 0.1.
+parameter glideMargin is 0.2.
 parameter entryAoA is 50.
 parameter glideAoA is 20.
+
+run once lib_notify.
+run once lib_vectors.
+run once lib_maneuver.
+run once lib_warp.
+run once lib_staging.
+run once lib_chutes.
 
 local warpMargin is 30.
 local currentV is 0.
 
-is ship:status <> "Orbiting" and ship:status <> "Escaping"
+if ship:status <> "Orbiting" and ship:status <> "Escaping"
 {
 	notify("Incorrect ship state for this script: " + ship:status).
 }
@@ -35,6 +43,7 @@ if alt:periapsis > deorbitPeriapsis // need to burn to deorbit
 	lock throttle to 1.
 	wait until alt:periapsis < deorbitPeriapsis.
 	lock throttle to 0.
+	wait 2.
 	notify("Descending from orbit").
 }
 else
@@ -50,7 +59,7 @@ lock steering to ship:srfretrograde.
 if eta:periapsis > warpMargin
 {
 	notify("Warping").
-	warpFor(eta:periapsis).
+	warpFor(max(eta:periapsis - 600).
 	// will exit warp automatically when hitting atmosphere
 	notify("End warp").
 }
@@ -64,12 +73,13 @@ wait until ship:altitude < ship:body:atm:height * atmosphereMargin.
 notify("Using up fuel").
 lock throttle to 1.
 wait until ship:liquidfuel < 1.
+wait 5.
 
 // Winged aerobraking
 notify("Aerobraking").
 lock steering to withAngleOfAttack(ship:velocity:surface, entryAoA).
 
-when ship:q > glideQ then
+when ship:q > glideQ or ship:altitude < glideMargin * ship:body:atm:height then
 {
 	notify("Gliding").
 	brakes on.
@@ -79,10 +89,11 @@ when ship:q > glideQ then
 // Landing gear
 wait until alt:radar < 100.
 notify("Preparing for landing").
+hideArrows().
 lock steering to horizon(ship:velocity:surface).
 gear on.
 legs on.
 
 // Landing
-wait until ship:status = "LANDED".
+wait until ship:status = "Landed" or ship:status = "Splashed".
 notify("Landed").

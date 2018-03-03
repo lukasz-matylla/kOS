@@ -31,7 +31,7 @@ function mnvTime
 	if ens_thrust = 0 or ens_dm = 0 
 	{
 		notify("ERROR: No engines available!").
-		return 0.
+		return 1000000.
 	}
 	else 
 	{
@@ -78,7 +78,7 @@ function execNode
 
 	notify("Aligning for maneuver").
 	local startTime is time:seconds + n:eta - mnvTime(v:mag/2).
-	lock steering to n:burnvector.
+	lock steering to lookdirup(n:burnvector, ship:up:vector).
 	waitForAlignment().
 
 	 if autoWarp and startTime - time:seconds > warpMargin
@@ -116,9 +116,10 @@ function timeToImpact
 function periChangeNode
 {
 	parameter h is alt:apoapsis.
-	set h to min(h, alt.apoapsis * (1 - orbitMargin)).
+	set h to min(h, alt:apoapsis * (1 - orbitMargin)).
 	
 	local n is node(time:seconds + eta:apoapsis, 0, 0, 0).
+	add n.
 	
 	if h > alt:periapsis * (1 + orbitMargin)
 	{
@@ -128,7 +129,7 @@ function periChangeNode
 		{
 			set n:prograde to n:prograde + bigJump.
 		}
-		until circ:orbit:periapsis < h
+		until n:orbit:periapsis < h
 		{
 			set n:prograde to n:prograde - smallJump.
 		}
@@ -141,7 +142,7 @@ function periChangeNode
 		{
 			set n:prograde to n:prograde - bigJump.
 		}
-		until circ:orbit:periapsis > h
+		until n:orbit:periapsis > h
 		{
 			set n:prograde to n:prograde + smallJump.
 		}
@@ -149,17 +150,17 @@ function periChangeNode
 	else
 	{
 		notify("No burn necessary").
+		remove n.
 	}
-	
-	return n.
 }
 
 function apoChangeNode
 {
 	parameter h is alt:periapsis.
-	set h to max(h, alt.periapsis * (1 + orbitMargin)).
+	set h to max(h, alt:periapsis * (1 + orbitMargin)).
 	
 	local n is node(time:seconds + eta:periapsis, 0, 0, 0).
+	add n.
 	
 	if h > alt:apoapsis * (1 + orbitMargin)
 	{
@@ -169,7 +170,7 @@ function apoChangeNode
 		{
 			set n:prograde to n:prograde + bigJump.
 		}
-		until circ:orbit:apoapsis < h
+		until n:orbit:apoapsis < h
 		{
 			set n:prograde to n:prograde - smallJump.
 		}
@@ -182,7 +183,7 @@ function apoChangeNode
 		{
 			set n:prograde to n:prograde - bigJump.
 		}
-		until circ:orbit:apoapsis > h
+		until n:orbit:apoapsis > h
 		{
 			set n:prograde to n:prograde + smallJump.
 		}
@@ -190,7 +191,6 @@ function apoChangeNode
 	else
 	{
 		notify("No burn necessary").
+		remove n.
 	}
-	
-	return n.
 }

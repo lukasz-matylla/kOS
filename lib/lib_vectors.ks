@@ -5,13 +5,6 @@ function waitForAlignment
 	wait until vang(steering:vector, ship:facing:vector) < steeringMargin.
 }
 
-function waitForAlignmentWith
-{
-	parameter v is ship:velocity:surface.
-	//wait until SteeringManager:angleError < steeringMargin.
-	wait until vang(steering:vector, v) < steeringMargin.
-}
-
 function horizon
 {
 	parameter v.
@@ -37,7 +30,7 @@ function withAngleToHorizon
 	parameter alfa.
 	
 	local hrs is horizon(v).
-	return lookdirup(angleaxis(alfa, vcrs(ship:up:vector, hrs))*hrs, ship:up:vector).
+	return lookdirup(angleaxis(-alfa, vcrs(ship:up:vector, hrs))*hrs, ship:up:vector).
 }
 
 function withAngleOfAttack
@@ -46,5 +39,5 @@ function withAngleOfAttack
 	parameter alfa.
 	
 	local hrs is horizon(v).
-	return lookdirup(angleaxis(alfa, vcrs(ship:up:vector, hrs))*v, ship:up:vector).
+	return lookdirup(angleaxis(-alfa, vcrs(ship:up:vector, hrs))*v, ship:up:vector).
 }
