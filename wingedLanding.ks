@@ -1,7 +1,7 @@
 parameter deorbitPeriapsis is 45000.
 parameter atmosphereMargin is 0.9.
 parameter glideQ is 0.1.
-parameter glideMargin is 0.2.
+parameter glideMargin is 0.3.
 parameter entryAoA is 50.
 parameter glideAoA is 20.
 
@@ -11,13 +11,15 @@ run once lib_maneuver.
 run once lib_warp.
 run once lib_staging.
 run once lib_chutes.
+run once lib_arrows.
 
 local warpMargin is 30.
 local currentV is 0.
 
-if ship:status <> "Orbiting" and ship:status <> "Escaping"
+if ship:status <> "Orbiting" and ship:status <> "Escaping" and ship:status <> "Sub_Orbital"
 {
 	notify("Incorrect ship state for this script: " + ship:status).
+	return.
 }
 
 // Deorbit
@@ -59,7 +61,7 @@ lock steering to ship:srfretrograde.
 if eta:periapsis > warpMargin
 {
 	notify("Warping").
-	warpFor(max(eta:periapsis - 600).
+	warpFor(eta:periapsis - 600).
 	// will exit warp automatically when hitting atmosphere
 	notify("End warp").
 }
@@ -77,23 +79,25 @@ wait 5.
 
 // Winged aerobraking
 notify("Aerobraking").
-lock steering to withAngleOfAttack(ship:velocity:surface, entryAoA).
+lock steering to withAngleOfAttack(ship:velocity:surface, 50).
+wait until ship:q > glideQ or ship:altitude < ship:body:atm:height * glideMargin.
 
-when ship:q > glideQ or ship:altitude < glideMargin * ship:body:atm:height then
-{
-	notify("Gliding").
-	brakes on.
-	lock steering to withAngleOfAttack(ship:velocity:surface, glideAoA).
-}
+// Glide
+notify("Gliding").
+lock steering to withAngleOfAttack(ship:velocity:surface, 15).
+wait until ship:groundSpeed < abs(ship:verticalSpeed).
 
-// Landing gear
+// Fall on chutes
+notify("Gently falling down").
+lock steering to withAngleToHorizon(ship:velocity:surface).
 wait until alt:radar < 100.
-notify("Preparing for landing").
-hideArrows().
-lock steering to horizon(ship:velocity:surface).
-gear on.
-legs on.
 
 // Landing
+notify("Landing").
+lock steering to withAngleToHorizon(ship:velocity:surface).
+hideArrows().
+gear on.
+legs on.
 wait until ship:status = "Landed" or ship:status = "Splashed".
+
 notify("Landed").
