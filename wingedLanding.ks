@@ -19,7 +19,6 @@ local currentV is 0.
 if ship:status <> "Orbiting" and ship:status <> "Escaping" and ship:status <> "Sub_Orbital"
 {
 	notify("Incorrect ship state for this script: " + ship:status).
-	return.
 }
 
 // Deorbit
@@ -89,12 +88,11 @@ wait until ship:groundSpeed < abs(ship:verticalSpeed).
 
 // Fall on chutes
 notify("Gently falling down").
-lock steering to withAngleToHorizon(ship:velocity:surface).
+lock steering to heading(0, 0).
 wait until alt:radar < 100.
 
 // Landing
 notify("Landing").
-lock steering to withAngleToHorizon(ship:velocity:surface).
 hideArrows().
 gear on.
 legs on.
