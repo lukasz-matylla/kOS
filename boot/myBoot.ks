@@ -3,6 +3,7 @@ copypath("0:/my/lib/lib_vectors.ks", ""). run once lib_vectors.
 copypath("0:/my/lib/lib_warp.ks", ""). run once lib_warp.
 copypath("0:/my/lib/lib_pid.ks", ""). run once lib_pid.
 copypath("0:/my/lib/lib_maneuver.ks", ""). run once lib_maneuver.
+copypath("0:/my/lib/lib_intercept.ks", ""). run once intercept.
 
 copypath("0:/my/lib/lib_arrows.ks", "").
 copypath("0:/my/lib/lib_staging.ks", ""). 
