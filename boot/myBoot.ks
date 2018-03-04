@@ -1,15 +1,23 @@
-copypath("0:/my/lib/lib_notify.ks", ""). run once lib_notify.
-copypath("0:/my/lib/lib_vectors.ks", ""). run once lib_vectors.
-copypath("0:/my/lib/lib_warp.ks", ""). run once lib_warp.
-copypath("0:/my/lib/lib_pid.ks", ""). run once lib_pid.
-copypath("0:/my/lib/lib_maneuver.ks", ""). run once lib_maneuver.
-copypath("0:/my/lib/lib_intercept.ks", ""). run once intercept.
-
+copypath("0:/my/lib/lib_arrows.ks", "").
+copypath("0:/my/lib/lib_staging.ks", ""). 
+copypath("0:/my/lib/lib_chutes.ks", ""). 
+copypath("0:/my/lib/lib_notify.ks", ""). 
+copypath("0:/my/lib/lib_vectors.ks", ""). 
+copypath("0:/my/lib/lib_warp.ks", ""). 
+copypath("0:/my/lib/lib_pid.ks", ""). 
+copypath("0:/my/lib/lib_maneuver.ks", ""). 
 copypath("0:/my/lib/lib_arrows.ks", "").
 copypath("0:/my/lib/lib_staging.ks", ""). 
 copypath("0:/my/lib/lib_chutes.ks", ""). 
 
-// copypath("0:/my/lib_asyncloop.ks", ""). run lib_asyncloop.
+// copypath("0:/my/lib_asyncloop.ks", ""). 
+
+run once lib_notify.
+run once lib_vectors.
+run once lib_warp.
+run once lib_pid.
+run once lib_maneuver.
+// run lib_asyncloop.
 
 copypath("0:/my/ascent.ks", "").
 // copypath("0:/my/align.ks", "").

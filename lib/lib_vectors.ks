@@ -1,8 +1,8 @@
-local steeringMargin is 2.
-
 function waitForAlignment
 {
-	wait until vang(steering:vector, ship:facing:vector) < steeringMargin.
+	parameter margin is 1.
+	
+	wait until vang(steering:vector, ship:facing:vector) < margin.
 }
 
 function horizon
@@ -40,4 +40,47 @@ function withAngleOfAttack
 	
 	local hrs is horizon(v).
 	return lookdirup(angleaxis(-alfa, vcrs(ship:up:vector, hrs))*v, ship:up:vector).
+}
+
+function relToBody
+{
+	parameter ves is target.
+	
+	return ves:position - ship:body:position.
+}
+
+function orbitNormal
+{
+	parameter ves.
+	return vcrs(relToBody(ves), ves:velocity:orbit):normalized.
+}
+
+function relativeInclination
+{
+	parameter ves1 is target.
+	parameter ves2 is ship.
+	
+	return vang(orbitNormal(ves1), orbitNormal(ves2)).
+}
+
+function signedAngle
+{
+	parameter v1.
+	parameter v2.
+	parameter n.
+	
+	if vcrs(v1, v2) * n > 0
+	{
+		return vang(v1, v2).
+	}
+	
+	return 360 - vang(v1, v2).
+}
+
+function planeCross
+{
+	parameter ves1 is target.
+	parameter ves2 is ship.
+	
+	return vcrs(orbitNormal(ves1), orbitNormal(ves2)).
 }

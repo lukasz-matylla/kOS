@@ -3,7 +3,7 @@ parameter finalBurnPeriapsis is 30000.
 
 run once lib_notify.
 run once lib_vectors.
-run once lib_maneuvers.
+run once lib_maneuver.
 run once lib_warp.
 run once lib_staging.
 run once lib_chutes.
@@ -54,7 +54,7 @@ lock steering to ship:srfretrograde.
 if eta:periapsis > warpMargin
 {
 	notify("Warping").
-	warpFor(eta:periapsis).
+	warpFor(eta:periapsis - 600).
 	// will exit warp automatically when hitting atmosphere
 	notify("End warp").
 }

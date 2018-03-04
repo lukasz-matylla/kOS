@@ -1,7 +1,14 @@
+run once lib_notify.
+run once lib_vectors.
+run once lib_arrows.
+
 local warpMargin is 30.
 local orbitMargin is 0.001.
 local bigJump is 50.
 local smallJump is 0.1.
+local speedMargin is 10.
+local speedTolerance is 0.1.
+local speedScale is 20.
 
 // Time to complete a maneuver
 function mnvTime
@@ -30,7 +37,7 @@ function mnvTime
 
 	if ens_thrust = 0 or ens_dm = 0 
 	{
-		notify("ERROR: No engines available!").
+		// May happen if staging during a maneuver
 		return 1000000.
 	}
 	else 
@@ -193,4 +200,51 @@ function apoChangeNode
 		notify("No burn necessary").
 		remove n.
 	}
+}
+
+function relativeStop
+{
+	parameter ves is target.
+	
+	lock relVel to ves:velocity:orbit - ship:velocity:orbit.
+	
+	lock steering to lookdirup(-relVel, ship:up:vector).
+	waitForAlignment().
+	lock throttle to relVel:mag / speedMargin.
+	wait until relVel:mag < speedTolerance.
+	lock throttle to 0.
+}
+
+function intercept
+{
+	parameter ves is target.
+	parameter finalDistance is 200.
+
+	if not hastarget
+	{
+		notify("No target selected").
+		return.
+	}
+
+	lock relPos to ves:position.
+	lock relVel to ves:velocity:orbit - ship:velocity:orbit.
+	
+	lock targetVel to relPos / speedScale.
+	
+	lock velCorrection to targetVel - relVel.
+	
+	//hideArrows().
+	//local posArrow is vecdrawargs(v(0, 0, 0), relPos * 0.01, red, "target position", 1, true, 0.2).
+	//set posArrow:vecUpdater to { return relPos * 0.01. }.
+	//local rvelArrow is vecdrawargs(v(0, 0, 0), relVel, green, "relative velocity", 1, true, 0.2).
+	//set rvelArrow:vecUpdater to { return relVel. }.
+	//local tvelArrow is vecdrawargs(v(0, 0, 0), targetVel, blue, "planned velocity", 1, true, 0.2).
+	//set tvelArrow:vecUpdater to { return targetVel. }.
+	//local corArrow is vecdrawargs(v(0, 0, 0), velCorrection, yellow, "correction", 1, true, 0.2).
+	//set corArrow:vecUpdater to { return velCorrection. }.
+	
+	lock steering to lookdirup(velCorrection, ship:up:vector).
+	lock throttle to relVel:mag / speedMargin.
+	wait until relPos:mag < finalDistance.
+	lock throttle to 0.
 }
