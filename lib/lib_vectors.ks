@@ -82,5 +82,5 @@ function planeCross
 	parameter ves1 is target.
 	parameter ves2 is ship.
 	
-	return vcrs(orbitNormal(ves1), orbitNormal(ves2)).
+	return vcrs(orbitNormal(ves1), orbitNormal(ves2)):normalized.
 }

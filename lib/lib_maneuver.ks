@@ -9,6 +9,7 @@ local smallJump is 0.1.
 local speedMargin is 10.
 local speedTolerance is 0.1.
 local speedScale is 20.
+local angleMargin is 0.1.
 
 // Time to complete a maneuver
 function mnvTime
@@ -215,36 +216,55 @@ function relativeStop
 	lock throttle to 0.
 }
 
-function intercept
+function timeToAngle
 {
-	parameter ves is target.
-	parameter finalDistance is 200.
-
-	if not hastarget
+	parameter tang is 0.
+	
+	local nor is orbitNormal(ship).
+	
+	// Iteratively find the time of crossing
+	local t0 is time:seconds.
+	local t is 0.
+	until false
 	{
-		notify("No target selected").
-		return.
+		local p is positionat(ship, t0+t) - ship:body:position. // ship's position after time t, in planet's reference
+		local ang is signedAngle(-ship:body:position, p, nor).
+		local err is ang - tang.
+		
+		if abs(err) < angleMargin
+		{
+			return t - t0.
+		}
+		else
+		{
+			local speedratio is p:mag / ship:orbit:semimajoraxis.
+			set t to t - speedratio * err * ship:orbit:period / 360.
+		}
 	}
+}
 
-	lock relPos to ves:position.
-	lock relVel to ves:velocity:orbit - ship:velocity:orbit.
+function resizeOrbit
+{
+	parameter r is alt:apoapsis.
 	
-	lock targetVel to relPos / speedScale.
+	if r > alt:periapsis
+	{
+		notify("Adjusting apoapsis to " + r).
+		apoChangeNode(r).
+		execNode().
+		notify("Circularizing").
+		periChangeNode().
+		execNode().
+	}
+	else
+	{
+		notify("Adjusting apoapsis to " + r).
+		periChangeNode().
+		execNode().
+		notify("Circularizing").
+		apoChangeNode(r).
+		execNode().
+	}
 	
-	lock velCorrection to targetVel - relVel.
-	
-	//hideArrows().
-	//local posArrow is vecdrawargs(v(0, 0, 0), relPos * 0.01, red, "target position", 1, true, 0.2).
-	//set posArrow:vecUpdater to { return relPos * 0.01. }.
-	//local rvelArrow is vecdrawargs(v(0, 0, 0), relVel, green, "relative velocity", 1, true, 0.2).
-	//set rvelArrow:vecUpdater to { return relVel. }.
-	//local tvelArrow is vecdrawargs(v(0, 0, 0), targetVel, blue, "planned velocity", 1, true, 0.2).
-	//set tvelArrow:vecUpdater to { return targetVel. }.
-	//local corArrow is vecdrawargs(v(0, 0, 0), velCorrection, yellow, "correction", 1, true, 0.2).
-	//set corArrow:vecUpdater to { return velCorrection. }.
-	
-	lock steering to lookdirup(velCorrection, ship:up:vector).
-	lock throttle to relVel:mag / speedMargin.
-	wait until relPos:mag < finalDistance.
-	lock throttle to 0.
+	notify("Resizing orbit complete").
 }
