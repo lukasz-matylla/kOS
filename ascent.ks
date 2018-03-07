@@ -1,5 +1,5 @@
 parameter orbitHeight is 80000.
-parameter orbitAngle is 90.
+parameter orbitInclination is 0.
 parameter initialTurn is 30.
 parameter turnSpeed is 50.
 parameter gtSpeed is 250.
@@ -36,7 +36,7 @@ when ship:altitude > ship:body:atm:height*hThreshold and ship:q < pThreshold the
 // Launch
 clearLog().
 notify("Initiating launch").
-lock steering to heading(orbitAngle, 90).
+lock steering to heading(90 - orbitInclination, 90).
 lock throttle to 1.
 
 run once lib_arrows.
@@ -57,7 +57,7 @@ wait until ship:verticalSpeed > turnSpeed.
 
 // Initial turn
 notify("Initial turn").
-lock steering to heading(orbitAngle, 90 - initialTurn).
+lock steering to heading(90 - orbitInclination, 90 - initialTurn).
 wait until currentV:mag > gtSpeed.
 
 // Gravity turn

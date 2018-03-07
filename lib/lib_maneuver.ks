@@ -216,19 +216,22 @@ function relativeStop
 	lock throttle to 0.
 }
 
-function timeToAngle
+function timeToDirection
 {
-	parameter tang is 0.
+	parameter r.
+	parameter ves is ship.
 	
-	local nor is orbitNormal(ship).
+	
+	local nor is orbitNormal(ves).
+	local tang is signedAngle(-ves:body:position, r, nor).
 	
 	// Iteratively find the time of crossing
 	local t0 is time:seconds.
 	local t is 0.
 	until false
 	{
-		local p is positionat(ship, t0+t) - ship:body:position. // ship's position after time t, in planet's reference
-		local ang is signedAngle(-ship:body:position, p, nor).
+		local p is positionat(ves, t0+t) - ves:body:position. // vessel's position after time t, in planet's reference
+		local ang is signedAngle(-ves:body:position, p, nor).
 		local err is ang - tang.
 		
 		if abs(err) < angleMargin
@@ -237,10 +240,21 @@ function timeToAngle
 		}
 		else
 		{
-			local speedratio is p:mag / ship:orbit:semimajoraxis.
-			set t to t - speedratio * err * ship:orbit:period / 360.
+			local speedratio is p:mag / ves:orbit:semimajoraxis.
+			set t to t - speedratio * err * ves:orbit:period / 360.
 		}
 	}
+}
+
+function periDirection
+{
+	parameter ves is target.
+	
+	local n is orbitNormal(ves).
+	
+	local r is ves:position - ship:body:position.
+	local anom is (ves:orbit:meananomalyatepoch + 360 * (time:seconds - ves:orbit:epoch) /  ves:orbit:period) mod 360.
+	return angleAxis(-anom, n) * r:normalized.
 }
 
 function resizeOrbit
