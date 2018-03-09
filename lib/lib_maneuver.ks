@@ -216,47 +216,6 @@ function relativeStop
 	lock throttle to 0.
 }
 
-function timeToDirection
-{
-	parameter r.
-	parameter ves is ship.
-	
-	
-	local nor is orbitNormal(ves).
-	local tang is signedAngle(-ves:body:position, r, nor).
-	
-	// Iteratively find the time of crossing
-	local t0 is time:seconds.
-	local t is 0.
-	until false
-	{
-		local p is positionat(ves, t0+t) - ves:body:position. // vessel's position after time t, in planet's reference
-		local ang is signedAngle(-ves:body:position, p, nor).
-		local err is ang - tang.
-		
-		if abs(err) < angleMargin
-		{
-			return t - t0.
-		}
-		else
-		{
-			local speedratio is p:mag / ves:orbit:semimajoraxis.
-			set t to t - speedratio * err * ves:orbit:period / 360.
-		}
-	}
-}
-
-function periDirection
-{
-	parameter ves is target.
-	
-	local n is orbitNormal(ves).
-	
-	local r is ves:position - ship:body:position.
-	local anom is (ves:orbit:meananomalyatepoch + 360 * (time:seconds - ves:orbit:epoch) /  ves:orbit:period) mod 360.
-	return angleAxis(-anom, n) * r:normalized.
-}
-
 function resizeOrbit
 {
 	parameter r is alt:apoapsis.
@@ -281,4 +240,38 @@ function resizeOrbit
 	}
 	
 	notify("Resizing orbit complete").
+}
+
+function setPeriodChange
+{
+	parameter n.
+	parameter per.
+	parameter currentPer is ship:orbit:period.
+	
+	set n:prograde to 0.
+	set n:radialout to 0.
+	set n:normal to 0.
+	
+	if per > currentPer
+	{
+		until n:orbit:apoapsis < 0 or n:orbit:period > per
+		{
+			set n:prograde to n:prograde + bigJump.
+		}
+		until n:orbit:apoapsis > 0 and n:orbit:period < per
+		{
+			set n:prograde to n:prograde - smallJump.
+		}
+	}
+	else
+	{
+		until n:orbit:period < per
+		{
+			set n:prograde to n:prograde - bigJump.
+		}
+		until n:orbit:period > per
+		{
+			set n:prograde to n:prograde + smallJump.
+		}
+	}
 }

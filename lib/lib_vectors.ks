@@ -42,27 +42,6 @@ function withAngleOfAttack
 	return lookdirup(angleaxis(-alfa, vcrs(ship:up:vector, hrs))*v, ship:up:vector).
 }
 
-function relToBody
-{
-	parameter ves is target.
-	
-	return ves:position - ship:body:position.
-}
-
-function orbitNormal
-{
-	parameter ves.
-	return vcrs(relToBody(ves), ves:velocity:orbit):normalized.
-}
-
-function relativeInclination
-{
-	parameter ves1 is target.
-	parameter ves2 is ship.
-	
-	return vang(orbitNormal(ves1), orbitNormal(ves2)).
-}
-
 function signedAngle
 {
 	parameter v1.
@@ -75,12 +54,4 @@ function signedAngle
 	}
 	
 	return 360 - vang(v1, v2).
-}
-
-function planeCross
-{
-	parameter ves1 is target.
-	parameter ves2 is ship.
-	
-	return vcrs(orbitNormal(ves1), orbitNormal(ves2)):normalized.
 }

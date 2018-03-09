@@ -1,4 +1,4 @@
-// Starting from a distance much smaller than orbit diameter, approcha to direct contact range
+// Starting from a distance much smaller than orbit diameter, approach to direct contact range
 
 parameter ves is target.
 parameter finalDistance is 200.
