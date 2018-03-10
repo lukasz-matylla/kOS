@@ -60,8 +60,11 @@ lock steering to ship:srfretrograde.
 if eta:periapsis > warpMargin
 {
 	notify("Warping").
-	warpFor(eta:periapsis - 600).
+	set warp to 8.
+	wait 3.
 	// will exit warp automatically when hitting atmosphere
+	wait until ship:altitude < ship:body:atm:height.
+	set warp to 0.
 	notify("End warp").
 }
 
@@ -83,7 +86,7 @@ wait until ship:q > glideQ or ship:altitude < ship:body:atm:height * glideMargin
 
 // Glide
 notify("Gliding").
-lock steering to withAngleOfAttack(ship:velocity:surface, 15).
+lock steering to withAngleOfAttack(ship:velocity:surface, 20).
 wait until ship:groundSpeed < abs(ship:verticalSpeed).
 
 // Fall on chutes

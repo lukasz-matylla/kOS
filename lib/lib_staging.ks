@@ -6,7 +6,7 @@ when ship:maxThrust > 0 then // Launched
 {
 	set fullThrust to ship:maxThrust.
 
-	when ship:maxThrust < fullThrust then // Something ran out of fuel
+	when ship:maxThrust < fullThrust*thrustMargin then // Something ran out of fuel
 	{
 		notify("Staging").
 		set lastThrottle to throttle.

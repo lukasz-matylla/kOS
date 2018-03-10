@@ -54,13 +54,16 @@ lock steering to ship:srfretrograde.
 if eta:periapsis > warpMargin
 {
 	notify("Warping").
-	warpFor(eta:periapsis - 600).
+	set warp to 8.
+	wait 3.
 	// will exit warp automatically when hitting atmosphere
+	wait until ship:altitude < ship:body:atm:height.
+	set warp to 0.
 	notify("End warp").
 }
 
 // Entering atmosphere
-notify("Aerobraking").
+notify("Initial aerobraking").
 panels off.
 wait until eta:periapsis < 5 or alt:periapsis < finalBurnPeriapsis.
 
@@ -68,6 +71,7 @@ wait until eta:periapsis < 5 or alt:periapsis < finalBurnPeriapsis.
 notify("Using up fuel").
 lock throttle to 1.
 wait until ship:liquidfuel < 1.
+notify("Aerobraking").
 
 // Landing gear
 wait until alt:radar < 100.

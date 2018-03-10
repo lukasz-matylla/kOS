@@ -34,7 +34,7 @@ function meanAnomaly
 {
 	parameter ves.
 	
-	return (ves:orbit:meananomalyatepoch + 360 * (time:seconds - ves:orbit:epoch) /  ves:orbit:period) mod 360.
+	return mod(ves:orbit:meananomalyatepoch + 360 * (time:seconds - ves:orbit:epoch) /  ves:orbit:period, 360).
 }
 
 function timeToPeriapsis
