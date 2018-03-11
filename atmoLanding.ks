@@ -1,5 +1,5 @@
 parameter deorbitPeriapsis is 40000.
-parameter finalBurnPeriapsis is 30000.
+parameter finalBurnPeriapsis is 35000.
 
 run once lib_notify.
 run once lib_vectors.
@@ -25,11 +25,13 @@ if alt:periapsis > deorbitPeriapsis // need to burn to deorbit
 
         if eta:apoapsis > warpMargin
 		{
+			wait until ship:altitude > ship:body:atm:height.
 			notify("Warping").
 			warpFor(eta:apoapsis - warpMargin).
 			notify("End warp").
 		}
-
+		
+		lock steering to ship:retrograde.
         wait until eta:apoapsis < 5.
 	}
 	

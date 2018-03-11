@@ -1,5 +1,5 @@
 parameter deorbitPeriapsis is 45000.
-parameter atmosphereMargin is 0.9.
+parameter atmosphereMargin is 0.8.
 parameter glideQ is 0.1.
 parameter glideMargin is 0.3.
 parameter entryAoA is 50.
@@ -13,7 +13,7 @@ run once lib_staging.
 run once lib_chutes.
 run once lib_arrows.
 
-local warpMargin is 30.
+local warpMargin is 15.
 local currentV is 0.
 
 if ship:status <> "Orbiting" and ship:status <> "Escaping" and ship:status <> "Sub_Orbital"
@@ -22,8 +22,10 @@ if ship:status <> "Orbiting" and ship:status <> "Escaping" and ship:status <> "S
 }
 
 // Deorbit
+lock steering to ship:retrograde.
 if alt:periapsis > deorbitPeriapsis // need to burn to deorbit
 {
+
     if alt:apoapsis > 0 // not an escape trajectory
 	{
 		notify("Coasting to apoapsis").
@@ -38,7 +40,6 @@ if alt:periapsis > deorbitPeriapsis // need to burn to deorbit
 		wait until eta:apoapsis < 5.
 	}
 	
-	lock steering to ship:retrograde.
 	waitForAlignment().
 	notify("Deorbit burn").
 	lock throttle to 1.

@@ -33,13 +33,22 @@ when ship:altitude > ship:body:atm:height*hThreshold and ship:q < pThreshold the
 	notify("Switching reference to orbit").
 }
 
+// Save before launching
+lock steering to heading(90 - orbitInclination, 90).
+wait 5.
+if kuniverse:canquicksave
+{
+	set saveName to "Before launch of " + ship:name.
+	kuniverse:quicksaveto(saveName).
+	notify("Saved as '" + saveName + "'").
+}
+
 // Launch
 clearLog().
 notify("Initiating launch").
-lock steering to heading(90 - orbitInclination, 90).
+
 lock throttle to 1.
 
-run once lib_arrows.
 until false
 {
     stage.
@@ -94,10 +103,7 @@ execNode().
 
 // Finish
 notify("In orbit").
-lock steering to lookdirup(body("Sun"):position, body("Sun"):north:vector).
 panels on.
-waitForAlignment().
-notify("Aligned towards the Sun, panels deployed").
 wait 5.
 set ship:control:pilotmainthrottle to 0.
 unlock steering.
