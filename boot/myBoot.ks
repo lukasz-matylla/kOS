@@ -11,6 +11,7 @@ copypath("0:/my/lib/lib_staging.ks", "").
 copypath("0:/my/lib/lib_chutes.ks", ""). 
 copypath("0:/my/lib/lib_orbit.ks", ""). 
 
+copypath("0:/my/timedLaunch.ks", "").
 copypath("0:/my/ascent.ks", "").
 copypath("0:/my/align.ks", "").
 copypath("0:/my/intercept.ks", "").
