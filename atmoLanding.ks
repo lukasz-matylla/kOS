@@ -42,6 +42,7 @@ if alt:periapsis > deorbitPeriapsis // need to burn to deorbit
 	wait until alt:periapsis < deorbitPeriapsis.
 	lock throttle to 0.
 	notify("Descending from orbit").
+	wait 5.
 }
 else
 {
@@ -51,12 +52,13 @@ else
 // Prepare for reentry
 notify("Aligning for reentry").
 lock steering to ship:srfretrograde.
+waitForAlignment().
 
 // Descent
 if eta:periapsis > warpMargin
 {
 	notify("Warping").
-	set warp to 8.
+	set warp to 5.
 	wait 3.
 	// will exit warp automatically when hitting atmosphere
 	wait until ship:altitude < ship:body:atm:height.

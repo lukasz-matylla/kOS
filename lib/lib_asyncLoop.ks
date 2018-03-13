@@ -4,7 +4,7 @@ function RunLoop
 	parameter loopPeriod is 10.
 	
 	local t0 is time:seconds.
-	when time:seconds > t0 + loopPeriod
+	when time:seconds > t0 + loopPeriod then
 	{
 		if loopAction()
 		{

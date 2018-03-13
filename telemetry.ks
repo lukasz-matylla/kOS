@@ -3,7 +3,7 @@ run once lib_vectors.
 
 function getTemp
 {
-	if ship:sensors:hassuffix("Temp")
+	if ship:partsdubbedpattern("thermometer"):length > 0
 	{
 		return ship:sensors:temp.
 	}
@@ -11,9 +11,9 @@ function getTemp
 	return 0.
 }
 
-function getPres
+function getPress
 {
-	if ship:sensors:hassuffix("Pres")
+	if ship:partsdubbedpattern("barometer"):length > 0
 	{
 		return ship:sensors:pres.
 	}
@@ -21,19 +21,9 @@ function getPres
 	return 0.
 }
 
-function getLight
-{
-	if ship:sensors:hassuffix("Light")
-	{
-		return ship:sensors:light.
-	}
-	
-	return 0.
-}
-
 function getAcc
 {
-	if ship:sensors:hassuffix("Acc")
+	if ship:partsdubbedpattern("accelerometer"):length > 0
 	{
 		local aCoord is ship:sensors:acc.
 		local r is ship:body:radius + ship:altitude.
@@ -48,7 +38,7 @@ function getAcc
 
 function getGrav
 {
-	if ship:sensors:hassuffix("Grav")
+	if ship:partsdubbedpattern("gravioli"):length > 0
 	{
 		return ship:sensors:grav:mag * 9.81.
 	}
@@ -76,6 +66,16 @@ function getAscentAngle
 	return angleToHorizon(ship:velocity:surface).
 }
 
+function getThrust
+{
+	if stage:hassuffix("availableThrust")
+	{
+		return stage:availableThrust.
+	}
+	
+	return 0.
+}
+
 function logLine
 {
 	local logString is 
@@ -94,14 +94,13 @@ function logLine
 		round(getTemp(), 2) + "," +
 		round(getAcc(), 2) + "," +
 		round(getGrav(), 2) + "," +
-		round(getLight(), 2) + "," +
 		round(getAoA(), 2) + "," +
 		round(getVerticalAoA(), 2) + "," +
 		round(getThrustAngle(), 2) + "," +
 		round(getAscentAngle(), 2) + "," +
 		round(ship:mass, 2) + "," +
 		round(ship:wetMass, 2) + "," +
-		round(stage:availableThrust, 2) + "," +
+		round(getThrust(), 2) + "," +
 		round(throttle, 3) + "," +
 		round(ship:orbit:apoapsis, 2) + "," +
 		round(ship:orbit:periapsis, 2) + "," +
@@ -117,6 +116,6 @@ deletePath("0:/logs/telemetry.csv").
 
 // First lines with basic information and column identifiers
 log "Telemetry for " + ship:name to "0:/logs/telemetry.csv".
-log "T,Status,Stage,Body,Altitude,AltitudeAGL,VerticalSpeed,GroundSpeed,AirSpeed,OrbitalSpeed,Q,Pres,Temp,Acceleration,Gravity,LightLevel,AoA,VerticalAoA,ThrustAngle,AscentAngle,Mass,WetMass,AvailableThrust,Throttle,Apoapsis,Periapsis,Inclination" to "0:/logs/telemetry.csv".
+log "T,Status,Stage,Body,Altitude,AltitudeAGL,VerticalSpeed,GroundSpeed,AirSpeed,OrbitalSpeed,Q,Pres,Temp,Acceleration,Gravity,AoA,VerticalAoA,ThrustAngle,AscentAngle,Mass,WetMass,AvailableThrust,Throttle,Apoapsis,Periapsis,Inclination" to "0:/logs/telemetry.csv".
 
 RunLoop(logLine@, 1).

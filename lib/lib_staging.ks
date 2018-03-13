@@ -3,7 +3,7 @@ local thrustMargin is 0.8.
 local fullThrust is 0.
 local stagingFreezed is false.
 
-function safeStage
+function SafeStage
 {
 	set lastThrottle to throttle.
 	lock throttle to 0.
@@ -43,7 +43,7 @@ when ship:maxThrust > 0 then // Launched
 	when ship:maxThrust < fullThrust*thrustMargin and not stagingFreezed then // Something ran out of fuel
 	{
 		notify("Staging").
-		if safeStage()
+		if SafeStage()
 		{
 			preserve.
 		}
