@@ -35,7 +35,12 @@ function getAcc
 {
 	if ship:sensors:hassuffix("Acc")
 	{
-		return ship:sensors:acc:mag.
+		local aCoord is ship:sensors:acc.
+		local r is ship:body:radius + ship:altitude.
+		local grav is ship:body:mu / (r^2).
+		local aProper is aCoord - ship:body:position:normalized*grav.
+		
+		return aProper:mag.
 	}
 	
 	return 0.
