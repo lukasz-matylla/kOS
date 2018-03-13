@@ -61,6 +61,11 @@ function getAoA
 	return vang(ship:facing:vector, ship:velocity:surface).
 }
 
+function getVerticalAoA
+{
+	return angleToHorizon(ship:facing:vector) - angleToHorizon(ship:velocity:surface).
+}
+
 function getThrustAngle
 {
 	return vang(ship:facing:vector, ship:velocity:orbit).
@@ -68,7 +73,7 @@ function getThrustAngle
 
 function getAscentAngle
 {
-	return vang(-ship:body:position, ship:velocity:surface).
+	return angleToHorizon(ship:velocity:surface).
 }
 
 function logLine
@@ -91,6 +96,7 @@ function logLine
 		round(getGrav(), 2) + "," +
 		round(getLight(), 2) + "," +
 		round(getAoA(), 2) + "," +
+		round(getVerticalAoA(), 2) + "," +
 		round(getThrustAngle(), 2) + "," +
 		round(getAscentAngle(), 2) + "," +
 		round(ship:mass, 2) + "," +
@@ -111,6 +117,6 @@ deletePath("0:/logs/telemetry.csv").
 
 // First lines with basic information and column identifiers
 log "Telemetry for " + ship:name to "0:/logs/telemetry.csv".
-log "T,Status,Stage,Body,Altitude,AltitudeAGL,VerticalSpeed,GroundSpeed,AirSpeed,OrbitalSpeed,Q,Pres,Temp,Acceleration,Gravity,LightLevel,AoA,ThrustAngle,AscentAngle,Mass,WetMass,AvailableThrust,Throttle,Apoapsis,Periapsis,Inclination" to "0:/logs/telemetry.csv".
+log "T,Status,Stage,Body,Altitude,AltitudeAGL,VerticalSpeed,GroundSpeed,AirSpeed,OrbitalSpeed,Q,Pres,Temp,Acceleration,Gravity,LightLevel,AoA,VerticalAoA,ThrustAngle,AscentAngle,Mass,WetMass,AvailableThrust,Throttle,Apoapsis,Periapsis,Inclination" to "0:/logs/telemetry.csv".
 
 RunLoop(logLine@, 1).
