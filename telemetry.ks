@@ -76,6 +76,7 @@ function logLine
 	local logString is 
 		round(missionTime, 2) + "," +
 		ship:status + "," +
+		stage:number + "," +
 		ship:body:name + "," +
 		round(ship:altitude, 2) + "," +
 		round(alt:radar, 2) + "," +
@@ -110,6 +111,6 @@ deletePath("0:/logs/telemetry.csv").
 
 // First lines with basic information and column identifiers
 log "Telemetry for " + ship:name to "0:/logs/telemetry.csv".
-log "T,Status,Body,Altitude,AltitudeAGL,VerticalSpeed,GroundSpeed,AirSpeed,OrbitalSpeed,Q,Pres,Temp,Acceleration,Gravity,LightLevel,AoA,ThrustAngle,AscentAngle,Mass,WetMass,AvailableThrust,Throttle,Apoapsis,Periapsis,Inclination" to "0:/logs/telemetry.csv".
+log "T,Status,Stage,Body,Altitude,AltitudeAGL,VerticalSpeed,GroundSpeed,AirSpeed,OrbitalSpeed,Q,Pres,Temp,Acceleration,Gravity,LightLevel,AoA,ThrustAngle,AscentAngle,Mass,WetMass,AvailableThrust,Throttle,Apoapsis,Periapsis,Inclination" to "0:/logs/telemetry.csv".
 
 RunLoop(logLine@, 1).
