@@ -55,3 +55,22 @@ function signedAngle
 	
 	return 360 - vang(v1, v2).
 }
+
+function GreatCircleNormal
+{
+	parameter initialAngle is 0.
+	parameter initialPos is -ship:body:position.
+	
+	local vRot is vcrs(ship:body:angularvelocity, initialPos).
+	local vInit is angleaxis(-initialAngle, initialPos) * vRot.
+	
+	return vcrs(initialPos, vInit):normalized.
+}
+
+function GreatCircleForward
+{
+	parameter circleNormal.
+	parameter pos is -ship:body:position.
+	
+	return vcrs(circleNormal, pos):normalized.
+}
