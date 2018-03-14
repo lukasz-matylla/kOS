@@ -55,6 +55,72 @@ function MnvTime
 	}
 }
 
+function StageStats
+{
+	local data is lexicon().
+	
+	// Thrust and ISP calculations
+	list engines in allEngines.
+	local activeEngines is list()
+	local totalThrust is 0.
+	local totalDm is 0.
+
+	for en in allEngines 
+	{
+		if en:ignition = true and en:flameout = false and en:availableThrust > 0 and en:isp > 0
+		{
+			activeEngines:add(en).
+	    }
+	}
+
+	for en in activeEngines 
+	{
+		set totalThrust to totalThrust + en:availableThrust.
+		set totalDm to totalDm + en:availableThrust / en:isp.
+	}
+	
+	// Fuel mass calculations
+	// Assumes that the stage does not consume several resources at the same time
+	local fuels is list().
+    fuels:add("LiquidFuel").
+    fuels:add("Oxidizer").
+    fuels:add("SolidFuel").
+    fuels:add("MonoPropellant").
+	
+	local fuelMass is 0.
+	for r in stage:resources
+    {
+        for f in fuels
+        {
+            if f = r:name
+            {
+                set fuelMass to fuelMass + r:amount*r:density.
+            }.
+        }.
+    }
+	
+	set data["fuel"] to fuelMass.
+	
+	if totalDm > 0
+	{
+		local g is kerbin:mu/kerbin:radius^2.
+		local isp is totalThrust / totalDm.
+	
+		set data["thrust"] to totalThrust.
+		set data["isp"] to isp.
+		set data["dv"] to isp * g * ln(ship:mass / (ship:mass - fuelMass)).
+	}
+	else
+	{
+		// This is possible when there are no active engines
+		set data["thrust"] to 0.
+		set data["isp"] to 0.001. // to prevent division by zero
+		set data["dv"] to 0.
+	}	
+	
+	return data.
+}
+
 function StageDv
 {
 	// fuel name list
