@@ -97,9 +97,9 @@ if ship:altitude < ship:body:atm:height
 }
 
 // Circularization
-periChangeNode(). // get peri up to apo
+PeriChangeNode(). // get peri up to apo
 notify("Execute circularization").
-execNode().
+ExecNode().
 
 // Finish
 notify("In orbit").

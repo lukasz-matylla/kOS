@@ -11,8 +11,10 @@ local speedTolerance is 0.1.
 local speedScale is 20.
 local angleMargin is 0.1.
 
+run once lib_staging.
+
 // Time to complete a maneuver
-function mnvTime
+function MnvTime
 {
 	parameter dv.
         
@@ -53,8 +55,65 @@ function mnvTime
 	}
 }
 
+function StageDv
+{
+	// fuel name list
+    local fuels is list().
+    fuels:add("LiquidFuel").
+    fuels:add("Oxidizer").
+    fuels:add("SolidFuel").
+    fuels:add("MonoPropellant").
+
+    // fuel density list (order must match name list)
+    local fuelsDensity is list().
+    fuelsDensity:add(0.005).
+    fuelsDensity:add(0.005).
+    fuelsDensity:add(0.0075).
+    fuelsDensity:add(0.004).
+
+    // initialize fuel mass sums
+    local fuelMass is 0.
+
+    // calculate total fuel mass
+    for r in stage:resources
+    {
+        local iter is 0.
+        for f in fuels
+        {
+            if f = r:name
+            {
+                set fuelMass to fuelMass + fuelsDensity[iter]*r:amount.
+            }.
+            set iter to iter+1.
+        }.
+    }.  
+
+    // thrust weighted average isp
+    local thrustTotal is 0.
+    local mDotTotal is 0.
+    list engines in engList. 
+    for eng in engList
+    {
+        if eng:ignition
+        {
+            local t is eng:availablethrust. // if multi-engine with different thrust limiters
+            set thrustTotal to thrustTotal + t.
+            if eng:isp = 0 set mDotTotal to 1. // shouldn't be possible, but ensure avoiding divide by 0
+            else set mDotTotal to mDotTotal + t / eng:isp.
+        }.
+    }.
+    if mDotTotal = 0 local avgIsp is 0.
+    else local avgIsp is thrustTotal/mDotTotal.
+
+    // deltaV calculation as isp*g0*ln(m0/m1).
+	local g is kerbin:mu/kerbin:radius^2. // gravitational acceleration constant (m/s^2)
+    local deltaV is avgIsp*g*ln(ship:mass / (ship:mass-fuelMass)).
+
+    return deltaV.
+}
+
 // Delta v requirements for Hohmann Transfer
-function hoffmanDv
+function HoffmanDv
 {
 	parameter desiredAltitude.
 
@@ -72,17 +131,24 @@ function hoffmanDv
 }
 
 // Execute the next node
-function execNode
+function ExecNode
 {
+	parameter allowStaging is false.
 	parameter autoWarp is true.
 	
-	if not hasnode // no node planned
+	if not HasNode // no node planned
 	{
 		return.
 	}
 
-	local n is nextnode.
+	local n is NextNode.
 	local v is n:burnvector.
+	
+	if (not allowStaging) and (StageDv() < v:mag)
+	{
+		notify("Current stage does not have enough delta V to perform the maneuver. Staging.").
+		SafeStage().
+	}
 
 	notify("Aligning for maneuver").
 	local startTime is time:seconds + n:eta - mnvTime(v:mag/2).
