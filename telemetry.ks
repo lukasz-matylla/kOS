@@ -83,7 +83,7 @@ function logLine
 		ship:status + "," +
 		stage:number + "," +
 		ship:body:name + "," +
-		round(ship:altitude, 2) + "," +
+		round(ship:altitude / 1000, 2) + "," +
 		round(alt:radar, 2) + "," +
 		round(ship:verticalspeed, 2) + "," +
 		round(ship:groundspeed, 2) + "," +
@@ -101,9 +101,9 @@ function logLine
 		round(ship:mass, 2) + "," +
 		round(ship:wetMass, 2) + "," +
 		round(getThrust(), 2) + "," +
-		round(throttle, 3) + "," +
-		round(ship:orbit:apoapsis, 2) + "," +
-		round(ship:orbit:periapsis, 2) + "," +
+		round(throttle * 100, 3) + "," +
+		round(ship:orbit:apoapsis / 1000, 2) + "," +
+		round(ship:orbit:periapsis / 1000, 2) + "," +
 		round(ship:orbit:inclination, 2).
 	
 	log logString to "0:/logs/telemetry.csv".
