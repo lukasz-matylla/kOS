@@ -2,7 +2,7 @@ parameter orbitHeight is 80000.
 parameter orbitInclination is 0.
 parameter initialTurn is 30.
 parameter turnSpeed is 50.
-parameter gtSpeed is 250.
+parameter etaGt is 45.
 
 run once lib_notify.
 run once lib_vectors.
@@ -67,11 +67,13 @@ wait until ship:verticalSpeed > turnSpeed.
 // Initial turn
 notify("Initial turn").
 lock steering to heading(90 - orbitInclination, 90 - initialTurn).
-wait until currentV:mag > gtSpeed.
+wait until eta:apoapsis > etaGt.
 
 // Gravity turn
 notify("Gravity turn").
-lock steering to optimalBurnDirection.
+lock optimalAngle to angleToHorizon(optimalBurnDirection:vector).
+lock apoCorrection to min(optimalAngle, 90*(1 - eta:apoapsis/etaGt) + optimalAngle*eta:apoapsis/etaGt).
+lock steering to WithAngleToHorizon(optimalBurnDirection:vector, apoCorrection).
 wait until alt:apoapsis > orbitHeight * (1 - orbitMargin).
 
 // Fine-tuning apoapsis
@@ -99,7 +101,7 @@ if ship:altitude < ship:body:atm:height
 // Circularization
 PeriChangeNode(). // get peri up to apo
 notify("Execute circularization").
-ExecNode().
+ExecNode(true).
 
 // Finish
 notify("In orbit").

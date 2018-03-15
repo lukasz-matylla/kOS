@@ -14,55 +14,13 @@ local speedScale is 20.
 local angleMargin is 0.1.
 local eccentricityMargin is 0.05.
 
-// Time to complete a maneuver
-function MnvTime
-{
-	parameter dv.
-        
-	local ens is list(). ens:clear.
-	local ens_thrust is 0.
-	local ens_dm is 0.
-        
-	list engines in myengines.
-
-	for en in myengines 
-	{
-		if en:ignition = true and en:flameout = false and en:availablethrust > 0 and en:isp > 0
-		{
-			ens:add(en).
-	    }
-	}
-
-	for en in ens 
-	{
-		set ens_thrust to ens_thrust + en:availablethrust.
-		set ens_dm to ens_dm + en:availablethrust / en:isp.
-	}
-
-	if ens_thrust = 0 or ens_dm = 0 
-	{
-		// May happen if staging during a maneuver
-		return 1000000.
-	}
-	else 
-	{
-		local f is ens_thrust * 1000. // engine thrust (kg * m/s²)
-		local m is ship:mass * 1000. // starting mass (kg)
-		local e is constant():e. // base of natural log
-		local g is kerbin:mu/kerbin:radius^2. // gravitational acceleration constant (m/s^2)
-		local p is ens_thrust / ens_dm. // engine isp (s) support to average different isp values
-					
-		return g * m * p * (1 - e^(-dv/(g*p))) / f.
-	}
-}
-
 function StageStats
 {
 	local data is lexicon().
 	
 	// Thrust and ISP calculations
 	list engines in allEngines.
-	local activeEngines is list()
+	local activeEngines is list().
 	local totalThrust is 0.
 	local totalDm is 0.
 
@@ -122,61 +80,26 @@ function StageStats
 	return data.
 }
 
-function StageDv
+// Time to complete a maneuver
+function MnvTime
 {
-	// fuel name list
-    local fuels is list().
-    fuels:add("LiquidFuel").
-    fuels:add("Oxidizer").
-    fuels:add("SolidFuel").
-    fuels:add("MonoPropellant").
+	local data is StageStats().
 
-    // fuel density list (order must match name list)
-    local fuelsDensity is list().
-    fuelsDensity:add(0.005).
-    fuelsDensity:add(0.005).
-    fuelsDensity:add(0.0075).
-    fuelsDensity:add(0.004).
-
-    // initialize fuel mass sums
-    local fuelMass is 0.
-
-    // calculate total fuel mass
-    for r in stage:resources
-    {
-        local iter is 0.
-        for f in fuels
-        {
-            if f = r:name
-            {
-                set fuelMass to fuelMass + fuelsDensity[iter]*r:amount.
-            }.
-            set iter to iter+1.
-        }.
-    }.  
-
-    // thrust weighted average isp
-    local thrustTotal is 0.
-    local mDotTotal is 0.
-    list engines in engList. 
-    for eng in engList
-    {
-        if eng:ignition
-        {
-            local t is eng:availablethrust. // if multi-engine with different thrust limiters
-            set thrustTotal to thrustTotal + t.
-            if eng:isp = 0 set mDotTotal to 1. // shouldn't be possible, but ensure avoiding divide by 0
-            else set mDotTotal to mDotTotal + t / eng:isp.
-        }.
-    }.
-    if mDotTotal = 0 local avgIsp is 0.
-    else local avgIsp is thrustTotal/mDotTotal.
-
-    // deltaV calculation as isp*g0*ln(m0/m1).
-	local g is kerbin:mu/kerbin:radius^2. // gravitational acceleration constant (m/s^2)
-    local deltaV is avgIsp*g*ln(ship:mass / (ship:mass-fuelMass)).
-
-    return deltaV.
+	if data["thrust"] = 0 
+	{
+		// May happen if staging during a maneuver
+		return 1000000.
+	}
+	else 
+	{
+		local f is data["thrust"] * 1000. // engine thrust (kg * m/s²)
+		local m is ship:mass * 1000. // starting mass (kg)
+		local e is constant():e. // base of natural log
+		local g is kerbin:mu/kerbin:radius^2. // gravitational acceleration constant (m/s^2)
+		local p data["isp"]. // engine isp
+					
+		return g * m * p * (1 - e^(-dv/(g*p))) / f.
+	}
 }
 
 // Delta v requirements for Hohmann Transfer

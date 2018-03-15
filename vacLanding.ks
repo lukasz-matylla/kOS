@@ -1,13 +1,15 @@
 local retrogradeThreshold is 1.
 local radarMargin is 100.
 local touchDownV is 2.
-local speedScale is 0.1.
+local speedScale is 0.2.
+local throttleScale is 0.2.
 
 run once lib_notify.
 run once lib_vectors.
-run once lib_maneuvers.
+run once lib_maneuver.
 run once lib_warp.
 run once lib_staging.
+run once lib_pid.
 
 if ship:status <> "Orbiting" and ship:status <> "Escaping"
 {
@@ -17,7 +19,7 @@ if ship:status <> "Orbiting" and ship:status <> "Escaping"
 // Retrograde, but prevent instabilities at low speed
 function upwards
 {
-	if ship:verticalVelocity < -retrogradeThreshold 
+	if ship:verticalSpeed < -retrogradeThreshold 
 	{
 		return ship:srfretrograde.
 	}
@@ -65,18 +67,16 @@ wait until timeToImpact(radarMargin) <= mnvTime(ship:velocity:surface:mag).
 
 // Suicide burn
 notify("Suicide burn").
-lock throttle to 1.
-lock descentTarget to -(alt:radar*speedScale + touchDownV).
-wait until ship:velocity:surface:mag < descentTarget or atl:radar < radarMargin.
+lock descentTarget to alt:radar*speedScale + touchDownV.
+lock throttle to (ship:velocity:surface:mag - descentTarget) * throttleScale.
+wait until alt:radar < radarMargin.
 
 // Redying landing gear
-when alt:radar < 100
-{
-	notify("Preparing for landing").
-	lock steering to up.
-	gear on.
-	legs on.
-}
+notify("Preparing for landing").
+lock steering to up.
+gear on.
+legs on.
+
 
 //Controlled descent
 notify("Beginning controlled descent").
@@ -86,7 +86,7 @@ lock throttle to pidThrottle.
 
 until ship:status = "Landed" 
 {
-	set pidThrottle TO pid(hoverPID, descentTarget, ship:verticalSpeed).
+	set pidThrottle TO pid(hoverPID, -descentTarget, ship:verticalSpeed).
 	WAIT 0.01.
 }
 

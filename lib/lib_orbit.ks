@@ -92,6 +92,6 @@ function periDirection
 	local n is orbitNormal(ves).
 	
 	local r is ves:position - ship:body:position.
-	local anom is (ves:orbit:meananomalyatepoch + 360 * (time:seconds - ves:orbit:epoch) /  ves:orbit:period) mod 360.
+	local anom is mod((ves:orbit:meananomalyatepoch + 360 * (time:seconds - ves:orbit:epoch) /  ves:orbit:period), 360).
 	return angleAxis(-anom, n) * r:normalized.
 }
