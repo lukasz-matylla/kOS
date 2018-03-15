@@ -2,7 +2,8 @@ function waitForAlignment
 {
 	parameter margin is 1.
 	
-	wait until vang(steering:vector, ship:facing:vector) < margin.
+	wait until vang(steering:vector, ship:facing:vector) < margin and
+		vang(steering:topvector, ship:facing:topvector) < margin.
 }
 
 function horizon

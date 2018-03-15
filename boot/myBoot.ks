@@ -22,6 +22,7 @@ copypath("0:/my/atmoLanding.ks", "").
 copypath("0:/my/wingedLanding.ks", "").
 copypath("0:/my/vacLanding.ks", "").
 copypath("0:/my/telemetry.ks", "").
+copypath("0:/my/dock.ks", "").
 
 run once lib_notify.
 
