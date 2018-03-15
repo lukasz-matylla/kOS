@@ -42,7 +42,7 @@ function withAngleOfAttack
 	return lookdirup(angleaxis(-alfa, vcrs(ship:up:vector, hrs))*v, ship:up:vector).
 }
 
-function signedAngle
+function SignedAngle
 {
 	parameter v1.
 	parameter v2.

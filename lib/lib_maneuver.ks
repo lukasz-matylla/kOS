@@ -1,6 +1,8 @@
 run once lib_notify.
 run once lib_vectors.
 run once lib_arrows.
+run once lib_staging.
+run once lib_orbit.
 
 local warpMargin is 30.
 local orbitMargin is 0.001.
@@ -10,8 +12,7 @@ local speedMargin is 10.
 local speedTolerance is 0.1.
 local speedScale is 20.
 local angleMargin is 0.1.
-
-run once lib_staging.
+local eccentricityMargin is 0.05.
 
 // Time to complete a maneuver
 function MnvTime
@@ -194,6 +195,110 @@ function HoffmanDv
 	local v2 is sqrt(u / r2) * (1 - sqrt((2 * r1) / (r1 + r2))).
 
 	return list(v1, v2).
+}
+
+function SetupHoffmanTo
+{
+	parameter myTarget is target.
+	parameter maxPhasing is 5.
+	
+	if not myTarget:isType("Orbitable")
+	{
+		notify("Cannot perform a Hoffman transfer to " + myTarget).
+		return.
+	}
+	
+	// This function assumes coplanar, circular initial and final orbit
+	if RelativeInclination(ship, myTarget) > angleMargin
+	{
+		notify("Relative inclination too big: " + RelativeInclination(ship, myTarget)).
+		return.
+	}
+	
+	if ship:orbit:eccentricity > eccentricityMargin
+	{
+		notify("Initial orbit is not circular, eccentricity " + ship:orbit:eccentricity).
+		return.
+	}
+	
+	if myTarget:orbit:eccentricity > eccentricityMargin
+	{
+		notify("Target orbit is not circular, eccentricity " + myTarget:orbit:eccentricity).
+		return.
+	}
+	
+	local dvs is HoffmanDv(myTarget:altitude).
+	local on is OrbitNortmal(ship).
+	local angleToTarget is SignedAngle(-ship:body:position, myTarget:position - ship:body:position).
+	local wMe is 360 / ship:orbit:period.
+	local wTarg is 360 / myTarget:orbit:period.
+	local relativeAngVel is wMe - wTarg.
+	local goUp is relativeAngVel > 0.
+	
+	if abs(relativeAngVel) < 0.000001
+	{
+		notify("Already very close to target orbit, can't time Hoffman transfer correctly").
+		return.
+	}
+	
+	// Create transfer node, without set time yet
+	if goUp
+	{
+		local n is node(time:seconds, 0, 0, dvs[0]). 
+	}
+	else
+	{
+		local n is node(time:seconds, 0, 0, -dvs[0]).
+	}
+	add n.
+	local transferTime is n:orbit:period / 2. // Time spent on the transfer orbit
+	
+	local phaseDif is mod(angleToTarget + wTarg*transferTime + 180, 360).
+
+	if relativeAngVel > 0 // Transferring up, gaining on target
+	{
+		set n:eta to phaseDif / relativeAngVel.
+	}
+	else // Transferring down, target gaining on ship
+	{
+		set n:eta to (phaseDif - 360) / relativeAngVel.
+	}
+	
+	if n:eta > maxPhasing * ship:orbit:period
+	{
+		notify("Required phasing time " + round(n:eta, 0) + "s is greater than the allowed " + maxPhasing + "phasing orbits (" + maxPhasing * ship:orbit:period + "s)").
+		remove n.
+		return.
+	}
+	
+	if myTarget:isType("Vessel")
+	{
+		// Circularize close to the target
+		notify("Setting circularization node close to the target").
+		if goUp
+		{
+			local m is node(time:seconds + n:eta + transferTime, 0, 0, dvs[1]).
+		}
+		else
+		{
+			local m is node(time:seconds + n:eta + transferTime, 0, 0, -dvs[1]).
+		}
+		
+		add m.
+	}
+	else if myTarget:isType("Body")
+	{
+		// Going to a celestial body - no circularization, but set up a node at SOI entry
+		if n:orbit:transition <> "Encounter" or n:orbit:nextpatch:body:name <> myTarget:name
+		{
+			notify("Something went wrong. Transfer orbit does not end in an encounter with target: " + n:orbit + ". Aborting transfer.").
+			return.
+		}
+		
+		notify("Setting empty maneuver node just after SOI switch").
+		local m is node(time:seconds + n:orbit:nextPatchEta + warpMargin, 0, 0, 0).
+		add m.
+	}
 }
 
 // Execute the next node

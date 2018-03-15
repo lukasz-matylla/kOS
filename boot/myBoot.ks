@@ -25,6 +25,12 @@ copypath("0:/my/telemetry.ks", "").
 
 run once lib_notify.
 
+on abort // Allow user to interrupt any script using Abort action group
+{
+	notify("Abort requested by user. Shutting down").
+	shutdown.
+}
+
 local missionName is "0:/" + ship:name + ".mission.ks".
 if exists(missionName)
 {
