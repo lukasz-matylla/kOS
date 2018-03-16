@@ -73,7 +73,9 @@ function timeToDirection
 		local ang is signedAngle(-ves:body:position, p, nor).
 		local err is ang - tang.
 		
-		if abs(err) < angleMargin
+		//print "t=" + t + ", ang=" + ang + ", err=" + err.
+		
+		if abs(err) < 0.01
 		{
 			return t - t0.
 		}

@@ -27,6 +27,7 @@ copypath("0:/my/dock.ks", "").
 copypath("0:/my/listParts.ks", "").
 
 run once lib_notify.
+run once telemetry.
 
 on abort // Allow user to interrupt any script using Abort action group
 {

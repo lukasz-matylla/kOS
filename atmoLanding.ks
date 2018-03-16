@@ -11,9 +11,17 @@ run once lib_arrows.
 
 local warpMargin is 30.
 
-if ship:status <> "Orbiting" and ship:status <> "Escaping"
+sas off.
+
+lock steering to lookdirup(-ship:velocity:orbit, ship:up:vector).
+when ship:altitude < ship:body:atm:height
 {
-	notify("Incorrect ship state for this script: " + ship:status).
+	lock steering to lookdirup(-ship:velocity:surface, ship:up:vector).
+	
+	when ship:groundSpeed < 20
+	{
+		unlock steering.
+	}
 }
 
 // Deorbit
@@ -31,11 +39,9 @@ if alt:periapsis > deorbitPeriapsis // need to burn to deorbit
 			notify("End warp").
 		}
 		
-		lock steering to ship:retrograde.
         wait until eta:apoapsis < 5.
 	}
 	
-	lock steering to ship:retrograde.
 	waitForAlignment().
 	notify("Deorbit burn").
 	lock throttle to 1.
@@ -80,7 +86,6 @@ notify("Aerobraking").
 // Landing gear
 wait until alt:radar < 100.
 notify("Preparing for landing").
-lock steering to up.
 gear on.
 legs on.
 

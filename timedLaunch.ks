@@ -1,6 +1,5 @@
 parameter ves is target.
 parameter orbitHeight is ves:orbit:periapsis.
-parameter initialTurn is 30.
 parameter angleMargin is 1.
 
 run once lib_vectors.
@@ -19,12 +18,12 @@ if vang(targetNorm, planetAxis) < angleMargin
 	if targetNorm*planetAxis > 0
 	{
 		notify("Launching into a simple equatorial orbit").
-		run ascent(orbitHeight, 0, initialTurn).
+		run ascent(orbitHeight, 0).
 	}
 	else
 	{
 		notify("Launching into a reverse equatorial orbit").
-		run ascent(orbitHeight, 180, initialTurn).
+		run ascent(orbitHeight, 180).
 	}
 }
 else
