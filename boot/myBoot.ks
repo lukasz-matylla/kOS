@@ -12,6 +12,7 @@ copypath("0:/my/lib/lib_chutes.ks", "").
 copypath("0:/my/lib/lib_orbit.ks", ""). 
 copypath("0:/my/lib/lib_asyncLoop.ks", "").
 copypath("0:/my/lib/lib_lists.ks", "").
+copypath("0:/my/lib/lib_actions.ks", "").
 
 copypath("0:/my/timedLaunch.ks", "").
 copypath("0:/my/ascent.ks", "").
@@ -23,6 +24,7 @@ copypath("0:/my/wingedLanding.ks", "").
 copypath("0:/my/vacLanding.ks", "").
 copypath("0:/my/telemetry.ks", "").
 copypath("0:/my/dock.ks", "").
+copypath("0:/my/listParts.ks", "").
 
 run once lib_notify.
 
