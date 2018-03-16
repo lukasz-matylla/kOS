@@ -17,4 +17,4 @@ run intercept(target).
 notify("Initial intercept complete. Closing up.").
 approach(target).
 
-notify("Visual contact achieved.").
+notify("Visual contact achieved. Manual control from here.").

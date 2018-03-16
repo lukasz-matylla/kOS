@@ -17,31 +17,24 @@ function AlignToDock
 
 function GoToRelavive
 {
-	parameter t. 
-	parameter d.
-	parameter tr.
+	parameter tar. 
+	parameter offset.
+	parameter dir is tar:facing.
 	
-	notify("Moving to " + tr + " relative to target").
+	notify("Moving to " + offset + " relative to target (" + tar:name + ")").
 	
-	//Consider using one PID and control:translate (vector). 
-	// First make sure how directions and vectors multiply, that is, what what are d*v(1, 0, 0), d*v(0, 1, 0) and d*v(0, 0, 1) 
-	// compared to d:vector, d:upvector and d:starvector
+	local posPid is initPidVector(0.1, 0.001, 1, 1).
 	
-	local xPid is initPid(0.1, 0.001, 1, -1, 1).
-	local yPid is initPid(0.1, 0.001, 1, -1, 1).
-	local zPid is initPid(0.1, 0.001, 1, -1, 1).
-	
-	lock ship:control:fore to pid(xPid, (d*tr):x, -t:position:x).
-	lock ship:control:top to pid(yPid, (d*tr):y, -t:position:y).
-	lock ship:control:starboard to pid(zPid, (d*tr):z, -t:position:z).
+	lock ship:control to pidVector(posPid, dir*offset, -tar:position).
 	
 	until (d*tr + t:position:x):mag < posMargin
 	{
-		local arTargFore is VecDraw(t:position, d:vector * 5, yellow, "Target Front", 1, true).
-		local arTargUp is VecDraw(t:position, d:upvector * 5, yellow, "Target Up", 1, true).
+		local arTargFore is VecDraw(tar:position, dir:vector * 5, yellow, "Target Front", 1, true).
+		local arTargUp is VecDraw(tar:position, dir:upvector * 5, yellow, "Target Up", 1, true).
 		local arMyFore is VecDraw(v(0, 0, 0), ship:facing:vector * 5, purple, "My Front", 1, true).
 		local arMyUp is VecDraw(v(0, 0, 0), ship:facing:upvector * 5, purple, "My Up", 1, true).
-		local arTarg is VecDraw(t:position, d*tr, white, "Waypoint", 1, true).
+		local arTarg is VecDraw(tar:position, dir*offset, white, "Waypoint", 1, true).
+		local arVel is VecDraw(v(0, 0, 0), ship:velocity:orbit - tar:velocity:orbit, green, "V", 1, true).
 		wait 0.1.
 	}
 	
@@ -65,31 +58,32 @@ else
 	// TODO: Activate Klaw
 }
 
-lock resPos to -target:position.
+lock relPos to -target:position.
 
 AlignToDock(d).
 
 if (relPos * d:vector < 0)
 {
 	notify("On wrong side of the target. Moving around.").
-	GoToRelative(tar, d, v(-safetyMargin, safetyMargin, 0)).
-	GoToRelative(tar, d, v(safetyMargin, safetyMargin, 0)).
+	GoToRelative(tar, d, v(0, safetyMargin, -safetyMargin)).
+	GoToRelative(tar, d, v(0, safetyMargin, safetyMargin)).
 }
 
-notify("Beginning approach").
-GoToRelative(tar, d, v(safetyMargin, 0, 0)).
+notify("Aligning for approach").
+GoToRelative(tar, d, v(0, 0, safetyMargin)).
 notify("Closing up").
-GoToRelative(tar, d, v(closeUp, 0, 0)).
-notify("Going for contact").
-GoToRelative(tar, d, v(0, 0, 0)).
+GoToRelative(tar, d, v(0, 0, closeUp)).
 
 if tar:isType("DockingPort")
 {
+	notify("Going in for contact").
+	GoToRelative(tar, d, v(0, 0, 0)).
 	wait until tar:state <> "Ready" and tar:state <> "PreAttached".
 }
 else
 {
-	// TODO: How to detect that Klaw connected
+	// TODO: Move forward fast to have the Klaw contact
+	// TODO: How to detect that Klaw connected?
 }
 
 unlock all.
