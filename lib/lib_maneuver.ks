@@ -83,6 +83,8 @@ function StageStats
 // Time to complete a maneuver
 function MnvTime
 {
+	parameter dv.
+
 	local data is StageStats().
 
 	if data["thrust"] = 0 
@@ -96,7 +98,7 @@ function MnvTime
 		local m is ship:mass * 1000. // starting mass (kg)
 		local e is constant():e. // base of natural log
 		local g is kerbin:mu/kerbin:radius^2. // gravitational acceleration constant (m/s^2)
-		local p data["isp"]. // engine isp
+		local p is data["isp"]. // engine isp
 					
 		return g * m * p * (1 - e^(-dv/(g*p))) / f.
 	}
@@ -227,7 +229,7 @@ function SetupHoffmanTo
 // Execute the next node
 function ExecNode
 {
-	parameter allowStaging is false.
+	parameter allowStaging is true.
 	parameter autoWarp is true.
 	
 	if not HasNode // no node planned
@@ -237,8 +239,9 @@ function ExecNode
 
 	local n is NextNode.
 	local v is n:burnvector.
+	local data is StageStats().
 	
-	if (not allowStaging) and (StageDv() < v:mag)
+	if (not allowStaging) and (data["dv"] < v:mag)
 	{
 		notify("Current stage does not have enough delta V to perform the maneuver. Staging.").
 		SafeStage().

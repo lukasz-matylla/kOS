@@ -2,7 +2,7 @@ parameter orbitHeight is 80000.
 parameter orbitInclination is 0.
 parameter initialTurn is 30.
 parameter turnSpeed is 50.
-parameter etaGt is 45.
+parameter etaGt is 20.
 
 run once lib_notify.
 run once lib_vectors.
@@ -16,11 +16,6 @@ local orbitMargin is 0.1.
 local warpMargin is 30.
 local circMargin is 5.
 local minThrottle is 0.1.
-
-if ship:status <> "Prelaunch"
-{
-	notify("Incorrect ship state for this script: " + ship:status).
-}
 
 local currentV is 0. 
 lock currentV to ship:velocity:surface.
@@ -66,15 +61,16 @@ wait until ship:verticalSpeed > turnSpeed.
 
 // Initial turn
 notify("Initial turn").
-lock steering to heading(90 - orbitInclination, 90 - initialTurn).
+lock steering to heading(90 - orbitInclination, 90 - initialTurn * eta:apoapsis / etaGt).
 wait until eta:apoapsis > etaGt.
 
 // Gravity turn
 notify("Gravity turn").
 lock optimalAngle to angleToHorizon(optimalBurnDirection:vector).
-lock apoCorrection to min(optimalAngle, 90*(1 - eta:apoapsis/etaGt) + optimalAngle*eta:apoapsis/etaGt).
+lock apoCorrection to max(optimalAngle, 90*(1 - eta:apoapsis/etaGt) + optimalAngle*eta:apoapsis/etaGt).
 lock steering to WithAngleToHorizon(optimalBurnDirection:vector, apoCorrection).
 wait until alt:apoapsis > orbitHeight * (1 - orbitMargin).
+
 
 // Fine-tuning apoapsis
 notify("Fine-tuning apoapsis").
