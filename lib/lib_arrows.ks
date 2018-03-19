@@ -22,12 +22,41 @@ function showBasicArrows
 	set vOrbit:vecUpdater to { return ship:velocity:orbit:normalized*20. }.
 }
 
+function showTargetingArrows
+{
+	if not hasTarget
+	{
+		return.
+	}
+	
+	if target:isType("DockingPort")
+	{
+		lock dir to target:portFacing.
+	}
+	else
+	{
+		lock dir to target:facing.
+	}
+
+	local arTargFore is VecDraw(target:position, dir:vector * 5, white, "Target Front", 1, true).
+	set arTargFore:startUpdater to target:position.
+	set arTargFore:vecUpdater to dir:vector * 5.
+	
+	local arTargUp is VecDraw(target:position, dir:upvector * 5, yellow, "Target Up", 1, true).
+	set arTargUp:startUpdater to target:position.
+	set arTargUp:vecUpdater to dir:upvector * 5.
+	
+	local arMyFore is VecDraw(v(0, 0, 0), ship:facing:vector * 5, green, "My Front", 1, true).
+	set arMyFore:vecUpdater to ship:facing:vector * 5.
+	
+	local arMyUp is VecDraw(v(0, 0, 0), ship:facing:upvector * 5, blue, "My Up", 1, true).
+	set arMyUp:vecUpdater to ship:facing:upvector * 5.
+	
+	local arVel is VecDraw(v(0, 0, 0), ship:velocity:orbit - target:velocity:orbit, red, "V", 1, true).
+	set arMyUp:vecUpdater to ship:velocity:orbit - target:velocity:orbit.
+}
+
 function hideArrows
 {
-	set shipFront to 0.
-	set shipUp to 0.
-	set steeringFront to 0.
-	set steeringUp to 0.
-	set vSurface to 0.
-	set vOrbit to 0.
+	clearVecDraws().
 }

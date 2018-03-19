@@ -25,6 +25,7 @@ copypath("0:/my/vacLanding.ks", "").
 copypath("0:/my/telemetry.ks", "").
 copypath("0:/my/dock.ks", "").
 copypath("0:/my/listParts.ks", "").
+copypath("0:/my/dockingArrows.ks", "").
 
 run once lib_notify.
 
