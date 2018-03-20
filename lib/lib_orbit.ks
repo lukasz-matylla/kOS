@@ -97,3 +97,16 @@ function periDirection
 	local anom is mod((ves:orbit:meananomalyatepoch + 360 * (time:seconds - ves:orbit:epoch) /  ves:orbit:period), 360).
 	return angleAxis(-anom, n) * r:normalized.
 }
+
+function PositiveApo
+{
+	parameter obt is ship:orbit.
+	
+	if obt:apoapsis > 0
+	{
+		return obt:apoapsis.
+	}
+	
+	// If it's not a closed orbit, return a value higher than any possible closed orbit apo
+	return 2 * obt:body:soiradius.
+}

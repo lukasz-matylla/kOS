@@ -13,6 +13,7 @@ copypath("0:/my/lib/lib_orbit.ks", "").
 copypath("0:/my/lib/lib_asyncLoop.ks", "").
 copypath("0:/my/lib/lib_lists.ks", "").
 copypath("0:/my/lib/lib_actions.ks", "").
+copypath("0:/my/lib/lib_solve.ks", "").
 
 copypath("0:/my/timedLaunch.ks", "").
 copypath("0:/my/ascent.ks", "").
