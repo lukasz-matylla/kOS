@@ -3,6 +3,7 @@ parameter orbitInclination is 0.
 parameter initialTurn is 30.
 parameter turnSpeed is 50.
 parameter etaGt is 20.
+parameter discardFuel is 10.
 
 run once lib_notify.
 run once lib_vectors.
@@ -62,7 +63,7 @@ wait until ship:verticalSpeed > turnSpeed.
 // Initial turn
 notify("Initial turn").
 lock steering to heading(90 - orbitInclination, 90 - initialTurn * eta:apoapsis / etaGt).
-wait until eta:apoapsis > etaGt.
+wait until angleToHorizon(ship:facing:vector) < 90 - initialTurn / 2 and verticalAoA(currentV, ship:facing:vector) > 0.
 
 // Gravity turn
 notify("Gravity turn").
@@ -94,10 +95,22 @@ if ship:altitude < ship:body:atm:height
 	}
 }
 
+// Discard launcher stage if it's nearly empty
+local circularized is false.
+when alt:periapsis > ship:body:atm:height * (1 - orbitMargin) and StageStats()["fuelPercent"] < discardFuel then
+{
+	if not circularized
+	{
+		notify("Current stage only has " + StageStats()["fuelPercent"] + "% fuel. Discarding before getting to orbit.").
+		SafeStage().
+	}
+}
+
 // Circularization
 PeriChangeNode(). // get peri up to apo
 notify("Execute circularization").
 ExecNode(true).
+set circularized to true.
 
 // Finish
 notify("In orbit").

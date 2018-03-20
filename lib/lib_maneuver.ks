@@ -59,6 +59,7 @@ function StageStats
     }
 	
 	set data["fuel"] to fuelMass.
+	set data["fuelPercent"] to 100 * fuelMass / (ship:wetmass + fuelMass - ship:mass).
 	
 	if totalDm > 0
 	{

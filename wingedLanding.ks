@@ -16,9 +16,11 @@ run once lib_arrows.
 local warpMargin is 15.
 local currentV is 0.
 
-if ship:status <> "Orbiting" and ship:status <> "Escaping" and ship:status <> "Sub_Orbital"
+if kuniverse:canquicksave
 {
-	notify("Incorrect ship state for this script: " + ship:status).
+	set saveName to "Before landing of " + ship:name.
+	kuniverse:quicksaveto(saveName).
+	notify("Saved as '" + saveName + "'").
 }
 
 // Deorbit

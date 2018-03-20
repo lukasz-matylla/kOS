@@ -1,5 +1,5 @@
 parameter deorbitPeriapsis is 40000.
-parameter finalBurnPeriapsis is 35000.
+parameter atmosphereMargin is 0.8.
 
 run once lib_notify.
 run once lib_vectors.
@@ -13,12 +13,19 @@ local warpMargin is 30.
 
 sas off.
 
+if kuniverse:canquicksave
+{
+	set saveName to "Before landing of " + ship:name.
+	kuniverse:quicksaveto(saveName).
+	notify("Saved as '" + saveName + "'").
+}
+
 lock steering to lookdirup(-ship:velocity:orbit, ship:up:vector).
-when ship:altitude < ship:body:atm:height
+when ship:altitude < ship:body:atm:height then
 {
 	lock steering to lookdirup(-ship:velocity:surface, ship:up:vector).
 	
-	when ship:groundSpeed < 20
+	when ship:groundSpeed < 20 then
 	{
 		unlock steering.
 	}
@@ -75,7 +82,7 @@ if eta:periapsis > warpMargin
 // Entering atmosphere
 notify("Initial aerobraking").
 panels off.
-wait until eta:periapsis < 5 or alt:periapsis < finalBurnPeriapsis.
+wait until ship:altitude < ship:body:atm:height * atmosphereMargin.
 
 // Final burn
 notify("Using up fuel").
@@ -92,3 +99,4 @@ legs on.
 // Landing
 wait until ship:status = "Landed" or ship:status = "Splashed".
 notify("Landed").
+sas on.

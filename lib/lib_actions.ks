@@ -1,3 +1,5 @@
+run once lib_notify.
+
 function DoPartEvent
 {
 	parameter partType.
@@ -115,4 +117,57 @@ function GetAllPartFields
 	}
 	
 	return res.
+}
+
+function DoAllScience
+{
+	parameter trans is true.
+	parameter doOneShots is false.
+	
+	local scienceModules is list().
+	list parts in partList.
+	for p in partList
+	{
+		if p:hasModule("ModuleScienceExperiment")
+		{
+			local m is p:getModule("ModuleScienceExperiment").
+			if (doOneShots or m:rerunnable) and not m:inoperable
+			{
+				scienceModules:add(m).
+			}
+		}
+	}
+	
+	for sm in scienceModules
+	{
+		if not sm:hasData
+		{
+			sm:deploy.
+			notify("Running experiment: " + sm:part:name).
+		}
+	}
+	
+	if trans
+	{
+		for sm in scienceModules
+		{
+			wait until sm:hasData.
+			if sm:data:transmitValue > 0
+			{
+				if not ship:electricCharge > sm:data:dataAmount * 6
+				{
+					notify("Waiting until " + sm:data:dataAmount * 6 + " electricity available for transfer from " + sm:part:name).
+					wait until ship:electricCharge > sm:data:dataAmount * 6
+				}
+				sm:transmit.
+				notify("Transmitting data from " + sm:part:name).
+				
+			}
+			else
+			{
+				sm:dump.
+				notify("Dumping data from " + sm:part:name).
+			}
+		}
+	}
 }

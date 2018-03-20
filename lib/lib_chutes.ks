@@ -1,8 +1,10 @@
-local maxAlt is 20000.
+local maxAlt is 5000.
 
-when ship:status = "Flying" and ship:maxThrust = 0 and ship:altitude < maxAlt and ship:verticalSpeed < 0 then
+when ship:status = "Flying" and ship:altitude < maxAlt and ship:verticalSpeed < 0 then
 {
 	notify("Arming chutes").
+	
+	lock throttle to 0.
 
 	when not chutesSafe then // some chutes may be safely deployed
 	{

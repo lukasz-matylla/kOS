@@ -18,6 +18,14 @@ function angleToHorizon
 	return 90 - vang(ship:up:vector, v).
 }
 
+function verticalAoA
+{
+	parameter v.
+	parameter f.
+	
+	return angleToHorizon(f) - angleToHorizon(v).
+}
+
 function horizonMirror
 {
 	parameter v.
