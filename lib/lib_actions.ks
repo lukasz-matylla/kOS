@@ -5,6 +5,8 @@ function DoPartEvent
 	parameter partType.
 	parameter eventName.
 	
+	local done is false.
+	
 	for p in ship:partsDubbedPattern(partType)
 	{
 		for modName in p:allModules
@@ -16,11 +18,14 @@ function DoPartEvent
 				if ev:contains(eventName)
 				{
 					mod:doEvent(ev).
+					set done to true.
 					break.
 				}
 			}
 		}
 	}
+	
+	return done.
 }
 
 function DoPartAction
@@ -28,6 +33,8 @@ function DoPartAction
 	parameter partType.
 	parameter actionName.
 	parameter val.
+	
+	local done is false.
 	
 	for p in ship:partsDubbedPattern(partType)
 	{
@@ -40,11 +47,14 @@ function DoPartAction
 				if ac:contains(actionName)
 				{
 					mod:doAction(ac, val).
+					set done to true.
 					break.
 				}
 			}
 		}
 	}
+	
+	return done.
 }
 
 function SetPartField
@@ -52,6 +62,8 @@ function SetPartField
 	parameter partType.
 	parameter fieldName.
 	parameter val.
+	
+	local done is false.
 	
 	for p in ship:partsDubbedPattern(partType)
 	{
@@ -64,11 +76,14 @@ function SetPartField
 				if f:contains(fieldName)
 				{
 					mod:setField(f, val).
+					set done to true.
 					break.
 				}
 			}
 		}
 	}
+	
+	return done.
 }
 
 function GetPartField
@@ -123,6 +138,7 @@ function DoAllScience
 {
 	parameter trans is true.
 	parameter doOneShots is false.
+	parameter waitTime is 30.
 	
 	local scienceModules is list().
 	list parts in partList.
@@ -147,26 +163,32 @@ function DoAllScience
 		}
 	}
 	
+	wait waitTime.
+	
 	if trans
 	{
 		for sm in scienceModules
 		{
-			wait until sm:hasData.
-			if sm:data:transmitValue > 0
+			if sm:hasData
 			{
-				if not ship:electricCharge > sm:data:dataAmount * 6
+				for d in sm:data
 				{
-					notify("Waiting until " + sm:data:dataAmount * 6 + " electricity available for transfer from " + sm:part:name).
-					wait until ship:electricCharge > sm:data:dataAmount * 6
+					if d:transmitValue > 0
+					{
+						if not (ship:electricCharge > d:dataAmount * 6)
+						{
+							notify("Waiting until " + d:dataAmount * 6 + " electricity available for transfer from " + sm:part:name).
+							wait until ship:electricCharge > d:dataAmount * 6.
+						}
+						sm:transmit.
+						notify("Transmitting '" + d:title +  "' from " + sm:part:name).
+					}
+					else
+					{
+						sm:dump.
+						notify("Dumping data from " + sm:part:name).
+					}
 				}
-				sm:transmit.
-				notify("Transmitting data from " + sm:part:name).
-				
-			}
-			else
-			{
-				sm:dump.
-				notify("Dumping data from " + sm:part:name).
 			}
 		}
 	}

@@ -249,8 +249,8 @@ function ExecNode
 	}
 
 	notify("Aligning for maneuver").
-	local startTime is time:seconds + n:eta - mnvTime(v:mag/2).
-	lock steering to lookdirup(n:burnvector, ship:up:vector).
+	local startTime is time:seconds + n:eta - mnvTime(v:mag)/2.
+	lock steering to lookdirup(v, ship:up:vector).
 	waitForAlignment().
 
 	 if autoWarp and startTime - time:seconds > warpMargin

@@ -8,7 +8,9 @@ if transmittable
 {
 	until false
 	{
+		notify("Running science").
 		DoAllScience().
+		notify("Waiting for " + checkPeriod + "s").
 		wait checkPeriod.
 	}
 }

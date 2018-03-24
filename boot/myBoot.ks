@@ -28,6 +28,7 @@ copypath("0:/my/dock.ks", "").
 copypath("0:/my/listParts.ks", "").
 copypath("0:/my/dockingArrows.ks", "").
 copypath("0:/my/runScience.ks", "").
+copypath("0:/my/waypointArrow.ks", "").
 
 run once lib_notify.
 run once telemetry.
