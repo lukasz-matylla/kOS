@@ -44,9 +44,9 @@ if alt:periapsis > deorbitPeriapsis // need to burn to deorbit
 	
 	waitForAlignment().
 	notify("Deorbit burn").
-	lock throttle to 1.
+	lock thr to 1.
 	wait until alt:periapsis < deorbitPeriapsis.
-	lock throttle to 0.
+	lock thr to 0.
 	wait 2.
 	notify("Descending from orbit").
 	wait 5.
@@ -80,7 +80,7 @@ wait until ship:altitude < ship:body:atm:height * atmosphereMargin.
 
 // Final burn
 notify("Using up fuel").
-lock throttle to 1.
+lock thr to 1.
 wait until ship:liquidfuel < 1.
 wait 5.
 

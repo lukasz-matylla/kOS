@@ -5,7 +5,6 @@ local stagingFreezed is false.
 
 function SafeStage
 {
-	set lastThrottle to throttle.
 	lock throttle to 0.
 	
 	wait until stage:ready. // Make sure that staging is possible now
@@ -16,7 +15,7 @@ function SafeStage
 	if ship:maxThrust > 0
 	{
 		set fullThrust to ship:maxThrust.
-		lock throttle to lastThrottle.
+		lock throttle to thr.
 		return true.
 	}
 	else

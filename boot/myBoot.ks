@@ -29,9 +29,13 @@ copypath("0:/my/listParts.ks", "").
 copypath("0:/my/dockingArrows.ks", "").
 copypath("0:/my/runScience.ks", "").
 copypath("0:/my/waypointArrow.ks", "").
+copypath("0:/my/execute.ks", "").
 
 run once lib_notify.
 run once telemetry.
+
+global thr is 0.
+lock throttle to thr.
 
 on abort // Allow user to interrupt any script using Abort action group
 {

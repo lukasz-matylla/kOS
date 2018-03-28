@@ -2,7 +2,7 @@ local retrogradeThreshold is 1.
 local radarMargin is 100.
 local touchDownV is 2.
 local speedScale is 0.2.
-local throttleScale is 0.2.
+local thrScale is 0.2.
 
 run once lib_notify.
 run once lib_vectors.
@@ -47,9 +47,9 @@ if alt:periapsis > 0 // need to burn to deorbit
 	lock steering to ship:retrograde.
 	waitForAlignment().
 	notify("Deorbit burn").
-	lock throttle to 1.
+	lock thr to 1.
 	wait until alt:periapsis < 0.
-	lock throttle to 0.
+	lock thr to 0.
 	notify("Descending from orbit").
 }
 else
@@ -68,7 +68,7 @@ wait until timeToImpact(radarMargin) <= mnvTime(ship:velocity:surface:mag).
 // Suicide burn
 notify("Suicide burn").
 lock descentTarget to alt:radar*speedScale + touchDownV.
-lock throttle to (ship:velocity:surface:mag - descentTarget) * throttleScale.
+lock thr to (ship:velocity:surface:mag - descentTarget) * thrScale.
 wait until alt:radar < radarMargin.
 
 // Redying landing gear
@@ -81,19 +81,19 @@ legs on.
 //Controlled descent
 notify("Beginning controlled descent").
 set hoverPid to initPid(0.05, 0.005, 0.01, 0, 1).
-local pidThrottle is 0.
-lock throttle to pidThrottle.
+local pidthr is 0.
+lock thr to pidthr.
 
 until ship:status = "Landed" 
 {
-	set pidThrottle TO pid(hoverPID, -descentTarget, ship:verticalSpeed).
+	set pidthr TO pid(hoverPID, -descentTarget, ship:verticalSpeed).
 	WAIT 0.01.
 }
 
 // Landing
-lock throttle to 0.
+lock thr to 0.
 wait 5.
 unlock steering.
-set ship:control:pilotmainthrottle to 0.
-unlock throttle.
+set ship:control:pilotmainthr to 0.
+unlock thr.
 notify("Landed").

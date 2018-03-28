@@ -10,7 +10,7 @@ local bigJump is 50.
 local smallJump is 0.1.
 local speedMargin is 10.
 local speedTolerance is 0.1.
-local speedScale is 20.
+local speedScale is 10.
 local angleMargin is 0.1.
 local eccentricityMargin is 0.05.
 
@@ -230,7 +230,7 @@ function SetupHoffmanTo
 // Execute the next node
 function ExecNode
 {
-	parameter allowStaging is true.
+	parameter allowStaging is false.
 	parameter autoWarp is true.
 	
 	if not HasNode // no node planned
@@ -248,8 +248,9 @@ function ExecNode
 		SafeStage().
 	}
 
+	local startTime is time:seconds + n:eta - mnvTime(v:mag/2).
+	notify("Node in " + round(n:eta) + "s. Estimated burn time: " + round(mnvTime(v:mag)) + "s. Burn starts " + round(mnvTime(v:mag/2)) + "s before node.").
 	notify("Aligning for maneuver").
-	local startTime is time:seconds + n:eta - mnvTime(v:mag)/2.
 	lock steering to lookdirup(v, ship:up:vector).
 	waitForAlignment().
 
@@ -263,9 +264,14 @@ function ExecNode
 	wait until time:seconds >= startTime.
 
 	notify("Maneuver burn").
-	lock throttle to min(mnvTime(n:burnvector:mag), 1).
-	wait until n:burnvector * v < 0.
-	lock throttle to 0.
+	lock burnLeft to n:burnvector * v:normalized.
+	lock thr to min(max(burnLeft / speedScale, 0), 1).
+	until burnLeft < 0
+	{
+		notify("|b|=" + n:burnvector:mag + ", B=" + burnLeft + ", alfa=" + vang(n:burnvector, v)).
+		wait 0.5.
+	}
+	lock thr to 0.
 
 	notify("Maneuver done").
 	remove n.
@@ -375,9 +381,9 @@ function relativeStop
 	
 	lock steering to lookdirup(-relVel, ship:up:vector).
 	waitForAlignment().
-	lock throttle to relVel:mag / speedMargin.
+	lock thr to relVel:mag / speedMargin.
 	wait until relVel:mag < speedTolerance.
-	lock throttle to 0.
+	lock thr to 0.
 }
 
 function resizeOrbit
