@@ -11,17 +11,12 @@ run once lib_maneuver.
 run once lib_warp.
 run once lib_staging.
 run once lib_chutes.
-run once lib_arrows.
+run once lib_save.
 
 local warpMargin is 15.
 local currentV is 0.
 
-if kuniverse:canquicksave
-{
-	set saveName to "Before landing of " + ship:name.
-	kuniverse:quicksaveto(saveName).
-	notify("Saved as '" + saveName + "'").
-}
+SaveGame("winged landing").
 
 // Deorbit
 lock steering to ship:retrograde.
@@ -86,12 +81,12 @@ wait 5.
 
 // Winged aerobraking
 notify("Aerobraking").
-lock steering to withAngleOfAttack(ship:velocity:surface, 50).
+lock steering to withAngleOfAttack(ship:velocity:surface, entryAoA).
 wait until ship:q > glideQ or ship:altitude < ship:body:atm:height * glideMargin.
 
 // Glide
 notify("Gliding").
-lock steering to withAngleOfAttack(ship:velocity:surface, 20).
+lock steering to withAngleOfAttack(ship:velocity:surface, glideAoA).
 wait until ship:groundSpeed < abs(ship:verticalSpeed).
 
 // Fall on chutes

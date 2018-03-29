@@ -10,7 +10,7 @@ local bigJump is 50.
 local smallJump is 0.1.
 local speedMargin is 10.
 local speedTolerance is 0.1.
-local speedScale is 10.
+local speedScale is 2.
 local angleMargin is 0.1.
 local eccentricityMargin is 0.05.
 
@@ -85,21 +85,20 @@ function StageStats
 function MnvTime
 {
 	parameter dv.
+	parameter stats is StageStats().
 
-	local data is StageStats().
-
-	if data["thrust"] = 0 
+	if stats["thrust"] = 0 
 	{
 		// May happen if staging during a maneuver
 		return 1000000.
 	}
 	else 
 	{
-		local f is data["thrust"] * 1000. // engine thrust (kg * m/s²)
+		local f is stats["thrust"] * 1000. // engine thrust (kg * m/s²)
 		local m is ship:mass * 1000. // starting mass (kg)
 		local e is constant():e. // base of natural log
 		local g is kerbin:mu/kerbin:radius^2. // gravitational acceleration constant (m/s^2)
-		local p is data["isp"]. // engine isp
+		local p is stats["isp"]. // engine isp
 					
 		return g * m * p * (1 - e^(-dv/(g*p))) / f.
 	}
@@ -230,7 +229,7 @@ function SetupHoffmanTo
 // Execute the next node
 function ExecNode
 {
-	parameter allowStaging is false.
+	parameter allowStaging is true.
 	parameter autoWarp is true.
 	
 	if not HasNode // no node planned
@@ -244,38 +243,32 @@ function ExecNode
 	
 	if (not allowStaging) and (data["dv"] < v:mag)
 	{
-		notify("Current stage does not have enough delta V to perform the maneuver. Staging.").
+		notify("Current stage does not have enough delta-V to perform the maneuver. Staging.").
 		SafeStage().
 	}
 
-	local startTime is time:seconds + n:eta - mnvTime(v:mag/2).
-	notify("Node in " + round(n:eta) + "s. Estimated burn time: " + round(mnvTime(v:mag)) + "s. Burn starts " + round(mnvTime(v:mag/2)) + "s before node.").
+	local startTime is time:seconds + n:eta - mnvTime(v:mag/2, data).
+	notify("Node in " + round(n:eta) + "s. Estimated burn time: " + round(mnvTime(v:mag, data)) + "s. Burn starts " + 
+		round(mnvTime(v:mag/2, data)) + "s before node.").
 	notify("Aligning for maneuver").
 	lock steering to lookdirup(v, ship:up:vector).
 	waitForAlignment().
 
-	 if autoWarp and startTime - time:seconds > warpMargin
+	if autoWarp and startTime - time:seconds > warpMargin
 	{
 		notify("Warping").
 		warpTo(startTime - warpMargin). 
-		notify("Warp finished").
 	}
 
 	wait until time:seconds >= startTime.
 
 	notify("Maneuver burn").
-	lock burnLeft to n:burnvector * v:normalized.
-	lock thr to min(max(burnLeft / speedScale, 0), 1).
-	until burnLeft < 0
-	{
-		notify("|b|=" + n:burnvector:mag + ", B=" + burnLeft + ", alfa=" + vang(n:burnvector, v)).
-		wait 0.5.
-	}
+	lock thr to min(vdot(n:burnvector, v:normalized) / speedScale, 1).
+	wait until vdot(n:burnvector, v:normalized) < 0.
 	lock thr to 0.
 
 	notify("Maneuver done").
 	remove n.
-	set ship:control:pilotmainthrottle to 0.
 	unlock steering.
 }
 

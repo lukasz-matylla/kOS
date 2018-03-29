@@ -10,11 +10,11 @@ run once lib_maneuver.
 run once lib_warp.
 run once lib_staging.
 run once lib_pid.
+run once lib_save.
 
-if ship:status <> "Orbiting" and ship:status <> "Escaping"
-{
-	notify("Incorrect ship state for this script: " + ship:status).
-}
+SaveGame("vacuum landing").
+
+sas off.
 
 // Retrograde, but prevent instabilities at low speed
 function upwards

@@ -1,15 +1,16 @@
 parameter orbitHeight is 80000.
 parameter orbitInclination is 0.
+parameter discardFuel is 100.
 parameter initialTurn is 30.
-parameter turnSpeed is 50.
 parameter etaGt is 30.
-parameter discardFuel is 1000.
+parameter turnSpeed is 50.
 
 run once lib_notify.
 run once lib_vectors.
 run once lib_maneuver.
 run once lib_warp.
 run once lib_staging.
+run once lib_save.
 
 local pThreshold is 0.02.
 local hThreshold is 0.7.
@@ -33,13 +34,7 @@ when ship:altitude > ship:body:atm:height*hThreshold and ship:q < pThreshold the
 
 // Save before launching
 lock steering to heading(90 - orbitInclination, 90).
-wait 2.
-if kuniverse:canquicksave
-{
-	set saveName to "Before launch of " + ship:name.
-	kuniverse:quicksaveto(saveName).
-	notify("Saved as '" + saveName + "'").
-}
+SaveGame("launch").
 
 // Launch
 clearLog().
@@ -92,21 +87,27 @@ wait until alt:apoapsis > orbitHeight.
 lock thr to 0.
 
 // Discard launcher stage if it's nearly empty
-local circularized is false.
-when alt:periapsis > ship:body:atm:height * (1 - orbitMargin) and StageStats()["dv"] < discardFuel then
+if alt:periapsis > ship:body:atm:height * (1 - orbitMargin) and StageStats()["dv"] < discardFuel then
 {
 	if not circularized
 	{
-		notify("Current stage only has " + StageStats()["dv"] + "m/s deltaV left. Discarding before getting to orbit.").
-		SafeStage().
+		
 	}
 }
 
 // Circularization
-PeriChangeNode(). // get peri up to apo
+PeriChangeNode(). // Set up circularization node
+
+// If the circularization burn is small and the stage will only have a bit of fuel left after circularization, get rid of it
+local stats is StageStats().
+if nextnode:burnvector:mag < discardFuel and stats["dv"] < nextnode:burnvector:mag + discardFuel
+{
+	notify("Current stage only has " + stats["dv"] + "m/s deltaV left. Discarding before getting to orbit.").
+	SafeStage().
+}
+
 notify("Execute circularization").
-ExecNode(true).
-set circularized to true.
+ExecNode(false).
 
 // Finish
 notify("In orbit").

@@ -7,18 +7,13 @@ run once lib_maneuver.
 run once lib_warp.
 run once lib_staging.
 run once lib_chutes.
-run once lib_arrows.
+run once lib_save.
 
 local warpMargin is 30.
 
 sas off.
 
-if kuniverse:canquicksave
-{
-	set saveName to "Before landing of " + ship:name.
-	kuniverse:quicksaveto(saveName).
-	notify("Saved as '" + saveName + "'").
-}
+SaveGame("atmospheric landing").
 
 lock steering to lookdirup(-ship:velocity:orbit, ship:up:vector).
 when ship:altitude < ship:body:atm:height then
@@ -88,7 +83,9 @@ wait until ship:altitude < ship:body:atm:height * atmosphereMargin.
 notify("Using up fuel").
 lock thr to 1.
 wait until ship:liquidfuel < 1.
+
 notify("Aerobraking").
+brakes on. // Airbrakes, inflatable shield and retracting panels
 
 // Landing gear
 wait until alt:radar < 100.

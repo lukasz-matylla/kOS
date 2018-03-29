@@ -14,6 +14,7 @@ copypath("0:/my/lib/lib_asyncLoop.ks", "").
 copypath("0:/my/lib/lib_lists.ks", "").
 copypath("0:/my/lib/lib_actions.ks", "").
 copypath("0:/my/lib/lib_solve.ks", "").
+copypath("0:/my/lib/lib_save.ks", "").
 
 copypath("0:/my/timedLaunch.ks", "").
 copypath("0:/my/ascent.ks", "").
@@ -32,10 +33,13 @@ copypath("0:/my/waypointArrow.ks", "").
 copypath("0:/my/execute.ks", "").
 
 run once lib_notify.
+run once lib_save.
 run once telemetry.
 
 global thr is 0.
 lock throttle to thr.
+
+SaveGame("script startup").
 
 on abort // Allow user to interrupt any script using Abort action group
 {
