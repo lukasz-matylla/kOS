@@ -86,15 +86,6 @@ lock thr to minThr + (orbitHeight - alt:apoapsis) / (orbitHeight * orbitMargin).
 wait until alt:apoapsis > orbitHeight.
 lock thr to 0.
 
-// Discard launcher stage if it's nearly empty
-if alt:periapsis > ship:body:atm:height * (1 - orbitMargin) and StageStats()["dv"] < discardFuel then
-{
-	if not circularized
-	{
-		
-	}
-}
-
 // Circularization
 PeriChangeNode(). // Set up circularization node
 

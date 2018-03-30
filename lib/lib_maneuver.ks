@@ -10,7 +10,7 @@ local bigJump is 50.
 local smallJump is 0.1.
 local speedMargin is 10.
 local speedTolerance is 0.1.
-local speedScale is 2.
+local speedScale is 20.
 local angleMargin is 0.1.
 local eccentricityMargin is 0.05.
 
@@ -263,7 +263,7 @@ function ExecNode
 	wait until time:seconds >= startTime.
 
 	notify("Maneuver burn").
-	lock thr to min(vdot(n:burnvector, v:normalized) / speedScale, 1).
+	lock thr to min(speedScale * vdot(n:burnvector, v:normalized) / v:mag, 1).
 	wait until vdot(n:burnvector, v:normalized) < 0.
 	lock thr to 0.
 
