@@ -1,3 +1,22 @@
+function Bound
+{
+	parameter v.
+	parameter lower is 0.
+	parameter upper is 1.
+	
+	if v < lower
+	{
+		return lower.
+	}
+	
+	if v > upper
+	{
+		return upper.
+	}
+	
+	return v.
+}
+
 function waitForAlignment
 {
 	parameter margin is 1.
