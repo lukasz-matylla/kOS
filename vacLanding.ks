@@ -84,7 +84,7 @@ set hoverPid to initPid(0.05, 0.005, 0.01, 0, 1).
 local pidthr is 0.
 lock thr to pidthr.
 
-until ship:status = "Landed" 
+until ship:status = "Landed" or ship:status = "Splashed"
 {
 	set pidthr TO pid(hoverPID, -descentTarget, ship:verticalSpeed).
 	WAIT 0.01.

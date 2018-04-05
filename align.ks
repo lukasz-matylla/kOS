@@ -7,7 +7,6 @@ run once lib_orbit.
 
 local angleTolerance is 0.01.
 
-local nor is orbitNormal(ship).
 local pc is planeCross(ves, ship).
 
 local n1 is orbitNormal(ship).
@@ -30,7 +29,7 @@ else
 	local dv is v2 - v1.
 
 	notify("Setting up maneuver").
-	local n is node(t, 0, dv * n1, dv * v1:normalized).
+	local n is node(t, 0, dv * n1:normalized, dv * v1:normalized).
 	add n.
 	execNode().
 	

@@ -31,6 +31,7 @@ copypath("0:/my/dockingArrows.ks", "").
 copypath("0:/my/runScience.ks", "").
 copypath("0:/my/waypointArrow.ks", "").
 copypath("0:/my/execute.ks", "").
+copypath("0:/my/suborbitalTest.ks", "").
 
 run once lib_notify.
 run once lib_save.

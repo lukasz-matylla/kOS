@@ -8,10 +8,10 @@ function relToBody
 	return ves:position - ship:body:position.
 }
 
-function orbitNormal
+function AngularMomentum
 {
 	parameter ves.
-	return vcrs(relToBody(ves), ves:velocity:orbit):normalized.
+	return vcrs(relToBody(ves), ves:velocity:orbit).
 }
 
 function relativeInclination
@@ -19,7 +19,7 @@ function relativeInclination
 	parameter ves1.
 	parameter ves2.
 	
-	return vang(orbitNormal(ves1), orbitNormal(ves2)).
+	return vang(AngularMomentum(ves1), AngularMomentum(ves2)).
 }
 
 function planeCross
@@ -27,7 +27,7 @@ function planeCross
 	parameter ves1.
 	parameter ves2.
 	
-	return vcrs(orbitNormal(ves1), orbitNormal(ves2)):normalized.
+	return vcrs(AngularMomentum(ves1), AngularMomentum(ves2)):normalized.
 }
 
 function meanAnomaly
@@ -61,7 +61,7 @@ function timeToDirection
 	parameter ves.
 	
 	
-	local nor is orbitNormal(ves).
+	local nor is AngularMomentum(ves).
 	local tang is signedAngle(-ves:body:position, r, nor).
 	
 	// Iteratively find the time of crossing
@@ -91,7 +91,7 @@ function periDirection
 {
 	parameter ves.
 	
-	local n is orbitNormal(ves).
+	local n is AngularMomentum(ves):normalized.
 	
 	local r is ves:position - ship:body:position.
 	local anom is mod((ves:orbit:meananomalyatepoch + 360 * (time:seconds - ves:orbit:epoch) /  ves:orbit:period), 360).
